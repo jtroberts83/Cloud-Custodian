@@ -1,0 +1,185 @@
+policies:
+
+- name: flow-mis-configured
+  resource: vpc
+  comments: |
+    Checks to see if the Flow Logs are 
+    enabled and setup for all traffic and notifies.
+  filters:
+    - not:
+       - type: flow-logs
+         enabled: true
+         set-op: or
+         op: equal
+         traffic-type: all
+         log-group: VPCFlowLogs
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - VPC Flow Logs Not Setup
+      violation_desc: "The Following Flow Logs Are Invalid:"
+      action_desc: "Actions Taken:  Notification Only"
+      to:
+        - Email@Company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: account-cloudtrail-enabled
+  resource: account
+  comments: |
+    Checks to make sure CloudTrail is enabled on the account
+    for all regions and notifies.
+  filters:
+     - type: check-cloudtrail
+       global-events: false
+       multi-region: false
+       running: false
+  actions:
+        - type: notify
+          template: default.html
+          priority_header: 1
+          subject: Cloud Custodian - CloudTrail Not Enabled!!!
+          violation_desc: "The Following Account's CloudTrail Is Not Configured Properly:"
+          action_desc: "Actions Taken:  Notification Only"
+          to:
+                - Email@Company.com
+          transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+                region: us-east-1
+
+
+
+- name: password-policy-check
+  resource: account
+  comments: |
+    Verifies password policy on account 
+    meets our requirements and notifies if not
+  region: us-east-1
+  filters:
+      - type: password-policy
+        key: MinimumPasswordLength
+        value: 14
+        op: lt
+      - type: password-policy
+        key: RequireSymbols
+        value: false
+      - type: password-policy
+        key: RequireNumbers
+        value: false
+      - type: password-policy
+        key: RequireUppercaseCharacters
+        value: false
+      - type: password-policy
+        key: RequireLowercaseCharacters
+        value: false
+      - type: password-policy
+        key: PasswordReusePrevention
+        value: 2
+        op: lt
+      - type: password-policy
+        key: MaxPasswordAge
+        value: 90
+        op: lt
+      - type: password-policy
+        key: ExpirePasswords
+        value: false
+      - type: password-policy
+        key: HardExpiry
+        value: false
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - Password Policy Error
+      violation_desc: "The Following Account's IAM Password Policy Does Not Meet Standards"
+      action_desc: "Actions Taken:  Notification Only"
+      to:
+        - Email@Company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+
+- name: root-mfa-check
+  resource: account
+  comments: |
+     Verifies if MFA is enabled for root user and notifies if not
+  filters:
+      - type: iam-summary
+        key: AccountMFAEnabled
+        value: false
+        op: eq
+        value_type: swap
+  actions:
+      - type: notify
+        template: default.html
+        priority_header: 2
+        subject: Cloud Custodian - Root MFA Not enabled
+        violation_desc: "The Following Account Is Missing a MFA On Root User:"
+        action_desc: "Actions Taken:  Notify Only"
+        to:
+          - Email@Company.com
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+          region: us-east-1
+
+
+
+- name: root-access-keys-check
+  resource: account
+  comments: |
+    Verifies root access keys don't exist anymore and notifies is they do
+  filters:
+      - type: iam-summary
+        key: AccountAccessKeysPresent
+        value: true
+        op: eq
+        value_type: swap
+  actions:
+      - type: notify
+        template: default.html
+        priority_header: 2
+        subject: Cloud Custodian - Root Access Keys Present
+        violation_desc: "The Following Account Has Root Access Keys Still Present:"
+        action_desc: "Actions Taken:  Notify Only"
+        to:
+          - Email@Company.com
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+          region: us-east-1
+
+
+
+######  S3 Policies ######
+##########################
+
+- name: agt-s3-global-acl
+  resource: s3
+  description: |
+    Notifies on all currently existing S3 buckets that have Global ACLs
+  filters:
+    - type: global-grants
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - S3 Invalid Global ACL on Existing Bucket
+      violation_desc: "The Following Existing S3 Buckets Have Public S3 Bucket ACLs:"
+      action_desc: "Actions Taken:  Notification Action Only"
+      to:
+        - Email@Company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+        region: us-east-1
