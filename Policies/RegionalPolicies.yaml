@@ -1,1 +1,473 @@
+policies:
 
+#####  EC2 Policies ######
+##########################
+
+- name: ec2-auto-tag-user
+  resource: ec2
+  mode:
+    type: cloudtrail
+    events:
+      - RunInstances
+  filters:
+    - tag:CreatorName: absent
+  actions:
+    - type: auto-tag-user
+      tag: CreatorName
+      principal_id_tag: CreatorId
+
+- name: ec2-mark-stopped-instance
+  resource: ec2
+  comments: |
+    Mark any stopped ec2 instance for deletion in 60 days and notify.
+    If an instance has not been started for 60 days or over
+    then they will be deleted similar to internal policies as it wont be patched.
+  filters:
+    - "tag:maid_status": absent
+    - "State.Name": stopped
+  actions:
+    - type: mark-for-op
+      op: stop
+      days: 60
+
+
+- name: ec2-unmark-running-deletion
+  resource: ec2
+  comments: |
+    Unmark/untag any ec2 instance that was scheduled for deletion due to being stopped
+    if they are currently running
+  filters:
+    - "State.Name": running
+    - "tag:maid_status": not-null
+  actions:
+    - unmark
+
+
+
+- name: ec2-delete-marked
+  resource: ec2
+  comments: |
+    Notify on any ec2 instances that were scheduled
+    for deletion if its been stopped for 60 days
+    and no longer up-to-date on patching
+  filters:
+    - type: marked-for-op
+      op: stop
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - EC2 Terminate Old Stopped Instance
+      violation_desc: "The following EC2(s) have been stopped for 60 days:"
+      action_desc: "Actions Taken:  The EC2(s) have been terminated as their patching is out-of-date"
+      to:
+        - EmailAddress@company.com
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: kill-public-ips
+  resource: ec2
+  comments: |
+    If a EC2 instance currently exists with a public IP attached
+    it will notify via Email unless its got a Name tag with a value of aviatrix
+  filters:
+    - type: value
+      key: "PublicIpAddress"
+      value: not-null
+    - not:
+       - type: value
+         key: tag:Name
+         op: regex
+         value: ^(aviatrix?)\w+
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - EC2 Existing Public IP Found
+      violation_desc: "The following EC2(s) have Public IP Addresses:"
+      action_desc: "Actions Taken:  Notify Action Only"
+      to:
+        - EmailAddress@company.com
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: no-ec2-public-ips
+  resource: ec2
+  comments: |
+    If a EC2 instance is launched with a public IP attached initially
+    it will get terminated unless its launched by aviatrix IAM service account
+    and Notification sent.
+  mode:
+    type: cloudtrail
+    events:
+        - RunInstances
+  filters:
+    - type: event
+      key: "detail.requestParameters.networkInterfaceSet.items[0].associatePublicIpAddress"
+      value: true
+    - not:
+       - type: event
+         key: "detail.userIdentity.userName"
+         op: regex
+         value: ^(SVCAVIATRIX?)\w+
+  actions:
+    - type: terminate
+      force: true
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: Cloud Custodian - EC2 Public IP Terminated
+      violation_desc: "The following EC2 has a Public IP Address:"
+      action_desc: "Actions Taken:  The EC2 Instance Has Been Terminated"
+      to:
+        - EmailAddress@company.com
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
+
+
+- name: high-risk-security-groups-remove-auth-remediate
+  resource: security-group
+  comments: |
+    Remove any rule from a security group that allows 0.0.0.0/0 ingress
+    except when the agt-cloudteam-tools invokes the change and notify.
+    This allows packer to create temp SGs for functionality.
+  mode:
+      type: cloudtrail
+      events:
+        - source: ec2.amazonaws.com
+          event: AuthorizeSecurityGroupIngress
+          ids: "requestParameters.groupId"
+        - source: ec2.amazonaws.com
+          event: AuthorizeSecurityGroupEgress
+          ids: "requestParameters.groupId"
+        - source: ec2.amazonaws.com
+          event: RevokeSecurityGroupEgress
+          ids: "requestParameters.groupId"
+        - source: ec2.amazonaws.com
+          event: RevokeSecurityGroupIngress
+          ids: "requestParameters.groupId"
+  filters:
+    - type: ingress
+      Cidr:
+          value: "0.0.0.0/0"
+    - not:
+        - type: event
+          key: "detail.userIdentity.arn"
+          value_type: swap
+          op: in
+          value: <EXCEPTION-SERVICE-ROLE-NAME-USED-TO-LAUNCH>
+  actions:
+      - type: remove-permissions
+        ingress: matched
+      - type: notify
+        template: default.html
+        priority_header: 1
+        subject: Cloud Custodian - EC2 Open Security Group
+        violation_desc: "The following Security Group Has a Rule Open To The World:"
+        action_desc: "Actions Taken:  The Violating Security Group Rule Has Been Revoked"
+        to:
+                - EmailAddress@company.com
+                - event-owner
+        transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+                region: us-east-1
+
+
+- name: high-risk-security-groups-remove-auth
+  resource: security-group
+  comments: |
+    Check all existing Security Groups and notify if any rule from a security group allows 0.0.0.0/0 ingress.
+  filters:
+    - type: ingress
+      Cidr:
+          value: "0.0.0.0/0"
+  actions:
+      - type: notify
+        template: default.html
+        priority_header: 1
+        subject: Cloud Custodian - EC2 Open Security Group
+        violation_desc: "The following Security Group Has a Rule Open To The World:"
+        action_desc: "Actions Taken:  Notification Only"
+        to:
+           - EmailAddress@company.com
+           - resource-owner
+        transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+                region: us-east-1
+
+
+
+
+
+#####  EBS Policies #####
+#########################
+
+- name: terminate-unencrypted-ebs
+  description: |
+       Terminate all unencrypted EBS volumes upon creation
+  resource: ebs
+  mode:
+    type: cloudtrail
+    events:
+      - CreateVolume
+  filters:
+    - Encrypted: false
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - EBS Volume Not Encrypted
+      violation_desc: "The following EBS Volume Is Not Encrypted:"
+      action_desc: "Actions Taken:  The non-encrypted volume has been deleted"
+      to:
+        - EmailAddress@company.com
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
+
+- name: ec2-require-non-public-and-encrypted-volumes
+  resource: ec2
+  description: |
+    Provision a lambda and cloud watch event target
+    that looks at all new instances and terminates those with
+    unencrypted volumes unless its launched by the specified service accounts.
+  mode:
+    type: cloudtrail
+    events:
+        - RunInstances
+  filters:
+    - type: ebs
+      key: Encrypted
+      value: false
+    - not:
+       - or:
+          - type: event
+            key: "detail.userIdentity.userName"
+            op: regex
+            value: ^(SVCAVIATRIX?)\w+
+          - type: event
+            key: "detail.userIdentity.userName"
+            op: regex
+            value: ^(svccloudbuilds?)\w+
+  actions:
+    - type: terminate
+      force: true
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - EC2 Server Launched and Volume Not Encrypted
+      violation_desc: "The following Server Has a EBS Volume That Is Not Encrypted:"
+      action_desc: "Actions Taken:  The server has been deleted"
+      to:
+        - EmailAddress@company.com
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+
+- name: ebs-mark-unattached-deletion
+  resource: ebs
+  comments: |
+    Mark any unattached EBS volumes for deletion in 60 days.
+    This will clean up old unused orphaned volumes that customers forget to delete.
+  filters:
+    - "tag:maid_status": absent
+    - State: available
+  actions:
+    - type: mark-for-op
+      op: delete
+      days: 60
+
+
+- name: ebs-unmark-attached-deletion
+  resource: ebs
+  comments: |
+    Unmark any attached EBS volumes that were scheduled for deletion
+    if they are currently attached to an instance
+  filters:
+    - State: in-use
+    - "tag:maid_status": not-null
+  actions:
+    - unmark
+
+
+
+- name: ebs-delete-marked
+  resource: ebs
+  comments: |
+    Delete any unattached EBS volumes that were scheduled for deletion 60 days prior and notify
+  filters:
+    - type: marked-for-op
+      op: delete
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - Unattached Volumes Deleted
+      violation_desc: "The following EBS Volumes Have Been Unattached For 60 Days:"
+      action_desc: "Actions Taken:  EBS Volumes Deleted"
+      to:
+        - EmailAddress@company.com
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+#####  RDS Policies #####
+#########################
+
+- name: agt-rds-unencrypted-public-remediate
+  description: |
+    Terminate all unencrypted or encrypted with non-company created KMS Key
+    or publicly available RDS upon their creation and notify
+  resource: rds
+  mode:
+    type: cloudtrail
+    events:
+      - CreateDBInstance
+  filters:
+    - or:
+        - StorageEncrypted: false
+        - PubliclyAccessible: true
+        - type: kms-alias
+          key: AliasName
+          value: '^(alias/aws/)'
+          op: regex
+  actions:
+    - type: delete
+      skip-snapshot: true
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - RDS New Terminated,Either public IP,No Encyption or wrong KMS Key used
+      violation_desc: "The following RDS Instance Is Either Not Encrypted With Company KMS Key or Is Publicly Accessible:"
+      action_desc: "Actions Taken:  RDS Instance Deleted"
+      to:
+        - EmailAddress@company.com
+        - event-owner
+      transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+                region: us-east-1
+
+
+
+- name: agt-rds-unencrypted-public
+  description: |
+    Notified on all unencrypted or encrypted with non-Company KMS Key or publicly available RDS instances
+  resource: rds
+  filters:
+    - or:
+        - StorageEncrypted: false
+        - PubliclyAccessible: true
+        - type: kms-alias
+          key: AliasName
+          value: '^(alias/aws/)'
+          op: regex
+  actions:
+   - type: notify
+     template: default.html
+     priority_header: 2
+     subject: Cloud Custodian - RDS Existing DB is Open or not Encypted
+     violation_desc: "The following RDS Instance(s) Are Either Not Encrypted With Company KMS Key or Are Publicly Accessible:"
+     action_desc: "Actions Taken:  Notification Action Only"
+     to:
+       - EmailAddress@company.com
+       - resource-owner
+     transport:
+       type: sqs
+       queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+       region: us-east-1
+
+
+
+- name: agt-rds-prd-multi-az-remediate
+  resource: rds
+  description: |
+    Notify on all Prod RDS Instances that are Not Multi AZ setup.
+  mode:
+    type: cloudtrail
+    events:
+      - CreateDBInstance
+  filters:
+    - type: value
+      key: 'tag:Environment'
+      value: '^pro?d'
+      op: regex
+    - MultiAZ: false
+  actions:
+   - type: notify
+     template: default.html
+     priority_header: 2
+     subject: Cloud Custodian - RDS Prod Not MultiAZ
+     violation_desc: "The following RDS Instance Is Tagged As Prod But Not MultiAZ:"
+     action_desc: "Actions Taken:  Notification Action Only"
+     to:
+       - EmailAddress@company.com
+       - event-owner
+     transport:
+       type: sqs
+       queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+       region: us-east-1
+
+
+################################
+#####    S3 Policies  ##########
+################################
+
+- name: agt-s3-global-acl-Remediate
+  resource: s3
+  description: |
+    Remediates and notifies on S3 bucket ACL changes that have Global ACLs
+  mode:
+     type: cloudtrail
+     events:
+        - source: s3.amazonaws.com
+          event: PutBucketAcl
+          ids: "requestParameters.bucketName"
+  filters:
+    - type: global-grants
+  actions:
+    - type: delete-global-grants
+      grantees:
+        - "http://acs.amazonaws.com/groups/global/AllUsers"
+        - "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: Cloud Custodian - S3 Invalid Global ACL on New Bucket
+      violation_desc: "The Following S3 Bucket Has Public S3 Bucket ACLs:"
+      action_desc: "Actions Taken:  Public ACL Removed"
+      to:
+        - EmailAddress@company.com
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNTNUMBER>/cloud-custodian-mailer
+        region: us-east-1
