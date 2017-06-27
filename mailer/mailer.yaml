@@ -1,1 +1,41 @@
+debug: True
+queue_url: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
 
+from_address: Cloud-Custodian@Company.com
+
+contact_tags:
+  - OwnerContact
+  - OwnerEmail
+  - SNSTopicARN
+
+region: us-east-1
+role: arn:aws:iam::<ACCOUNT-NUMBER-HERE>:role/Cloud_Custodian_Role
+timeout: 300
+subnets:
+  - subnet-00000000 # for ldap lookups
+  - subnet-11111111  # for ldap looups
+  - subnet-22222222  # for ldap looups
+security_groups:
+  - sg-11111111
+  - sg-22222222
+
+smtp_server: mail1.us.company.com
+smtp_port: 25
+smtp_ssl: False
+smtp_username: <USERNAME-HERE>
+smtp_password: <PASSWORD-HERE>
+http_proxy: http://<USERNAME-HERE>:<PASSWORD-HERE>@proxyaddress.com:9090
+https_proxy: http://<USERNAME-HERE>:<PASSWORD-HERE>@proxyaddress.com:9090
+
+
+ldap_uri: "ldap://LDAPADDRESS.com:389"
+ldap_bind_dn: "DC=Combined,DC=Global"
+ldap_bind_user: <USERNAME-HERE>
+ldap_bind_password: <PASSWORD-HERE>
+ldap_bind_password_in_kms: False
+ldap_uid_attribute: sAMAccountName
+ldap_email_key: mail
+ldap_manager_attribute: manager
+
+ldap_uid_tags:
+  - CreatorName
