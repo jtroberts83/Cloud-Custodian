@@ -1,0 +1,825 @@
+policies:
+
+##########################
+#####  EC2 Policies ######
+##########################
+
+- name: ec2-auto-tag-user
+  resource: ec2
+  mode:
+    type: cloudtrail
+    events:
+      - RunInstances
+  filters:
+    - tag:CreatorName: absent
+  actions:
+    - type: auto-tag-user
+      tag: CreatorName
+      principal_id_tag: CreatorId
+
+- name: ec2-mark-stopped-instance
+  resource: ec2
+  description: |
+    Mark any stopped ec2 instance for deletion in 60 days and notify.
+    If an instance has not been started for 60 days or over
+    then they will be deleted similar to internal policies as it wont be patched.
+  filters:
+    - "tag:maid_status": absent
+    - "State.Name": stopped
+  actions:
+    - type: mark-for-op
+      op: stop
+      days: 60
+
+
+- name: ec2-unmark-running-deletion
+  resource: ec2
+  description: |
+    Unmark/untag any ec2 instance that was scheduled for deletion due to being stopped
+    if they are currently running
+  filters:
+    - "State.Name": running
+    - "tag:maid_status": not-null
+  actions:
+    - unmark
+
+
+
+- name: ec2-delete-marked
+  resource: ec2
+  description: |
+    Notify on any ec2 instances that were scheduled
+    for deletion if its been stopped for 60 days
+    and no longer up-to-date on patching
+  filters:
+    - type: marked-for-op
+      op: stop
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "EC2 Stopped Instance Tagged [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "EC2(s) have been stopped for 60 days:"
+      action_desc: "Actions Taken:  The EC2(s) have been terminated as their patching is out-of-date"
+      to:
+        - CloudCustodian@company.com
+        #- resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: public-ips-found
+  resource: ec2
+  description: |
+    If a EC2 instance currently exists with a public IP attached
+    it will notify via Email unless its aviatrix
+  filters:
+    - type: value
+      key: "PublicIpAddress"
+      value: not-null
+    - not:
+       - type: value
+         key: tag:Name
+         op: regex
+         value: ^(aviatrix?)\w+
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "EC2 - Existing Public IP Found - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Public IP Addresses Found:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - CloudCustodian@company.com
+        #- resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: no-ec2-public-ips
+  resource: ec2
+  description: |
+    If a EC2 instance is launched with a public IP attached initially
+    or unencrypted EBS volume it will get terminated unless its aviatrix and Notification sent.
+  mode:
+    type: cloudtrail
+    events:
+        - RunInstances
+  filters:
+    - or:
+       - type: event
+         key: "detail.requestParameters.networkInterfaceSet.items[0].associatePublicIpAddress"
+         value: true
+       - type: ebs
+         key: Encrypted
+         value: false
+    - not:
+       - type: event
+         key: "detail.userIdentity.userName"
+         op: regex
+         value: ^(svcaviatrix?)\w+
+  actions:
+    - type: terminate
+      force: true
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "EC2 - Public IP Terminated - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Public IP Address:"
+      action_desc: "Actions Taken:  The EC2 Instance Has Been Terminated"
+      to:
+        - CloudCustodian@company.com
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+######################################
+#####   Security Group Policies  #####
+######################################
+
+
+- name: sg-mark-unused-for-deletion
+  resource: security-group
+  description: |
+    Mark any SG that's not attached to anything 
+    for deletion in 14 days
+  filters:
+    - "tag:maid_status": absent
+    - type: unused
+  actions:
+    - type: mark-for-op
+      tag: maid_status
+      msg: "Unused SG: {op}@{action_date}"
+      op: delete
+      days: 14
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "SG - Unused Security Group - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Security Groups Not Attached To Any Resources:"
+      action_desc: "Actions Taken:  Marked for deletion in 14 days"
+      to:
+         - CloudCustodian@company.com
+      transport:
+           type: sqs
+           queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+           region: us-east-1
+
+
+- name: sg-unmark-if-in-use
+  resource: security-group
+  description: |
+    Remove Delete tag from any SG which has 
+    resource(s) attached so it doesn't get
+    deleted during cleanup
+  filters:
+    - "tag:maid_status": not-null
+    - not:
+          - type: unused
+  actions:
+    - type: remove-tag
+      tags: [maid_status]
+
+
+- name: sg-delete-unused
+  resource: security-group
+  description: |
+    Delete any marked SGs which has no resources attached
+    if it has been that way for 14 days or more.
+  filters:
+    - type: marked-for-op
+      op: delete
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "SG - Deleted Unused Security Groups - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "No Resources Are Attached To Security Group for over 14 days:"
+      action_desc: "Actions Taken:  The Security Group has been deleted"
+      to:
+         - CloudCustodian@company.com
+      transport:
+           type: sqs
+           queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+           region: us-east-1
+
+
+- name: high-risk-security-groups-remediate
+  resource: security-group
+  description: |
+    Remove any rule from a security group that allows 0.0.0.0/0 ingress
+    except when the -cloudteam-tools invokes the change and notify.
+    This allows packer to create temp SGs for functionality.
+  mode:
+      type: cloudtrail
+      events:
+        - source: ec2.amazonaws.com
+          event: AuthorizeSecurityGroupIngress
+          ids: "requestParameters.groupId"
+        - source: ec2.amazonaws.com
+          event: AuthorizeSecurityGroupEgress
+          ids: "requestParameters.groupId"
+        - source: ec2.amazonaws.com
+          event: RevokeSecurityGroupEgress
+          ids: "requestParameters.groupId"
+        - source: ec2.amazonaws.com
+          event: RevokeSecurityGroupIngress
+          ids: "requestParameters.groupId"
+  filters:
+    - type: ingress
+      Cidr:
+          value: "0.0.0.0/0"
+    - not:
+        - type: event
+          key: "detail.userIdentity.arn"
+          value_type: swap
+          op: in
+          value: -cloudteam-tools
+  actions:
+      - type: remove-permissions
+        ingress: matched
+      - type: notify
+        template: default.html
+        priority_header: 1
+        subject: "EC2 - Open Security Group Rule Created - [custodian {{ account }} - {{ region }}]" 
+        violation_desc: "Security Group(s) With Rule Open To The World:"
+        action_desc: "Actions Taken:  The Violating Security Group Rule Has Been Removed"
+        to:
+                - CloudCustodian@company.com
+                #- event-owner
+        transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+                region: us-east-1
+
+
+- name: high-risk-security-groups-remove-auth
+  resource: security-group
+  description: |
+    Check all existing Security Groups and notify if any rule from a security group allows 0.0.0.0/0 ingress.
+  filters:
+    - type: ingress
+      Cidr:
+          value: "0.0.0.0/0"
+  actions:
+      - type: notify
+        template: default.html
+        priority_header: 1
+        subject: "EC2 - Existing Open Security Group(s) - [custodian {{ account }} - {{ region }}]" 
+        violation_desc: "Security Group(s) With a Rule Open To The World:"
+        action_desc: "Actions Taken:  Notification Only"
+        to:
+           - CloudCustodian@company.com
+           #- resource-owner
+        transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+                region: us-east-1
+
+
+###########################
+#####   ELB Policies  #####
+###########################
+
+- name: elb-mark-unused-for-deletion
+  resource: elb
+  description: |
+    Mark any ELB with no instances attached 
+    for deletion in 14 days
+  filters:
+    - "tag:maid_status": absent
+    - Instances: []
+  actions:
+    - type: mark-for-op
+      tag: maid_status
+      msg: "Unused ELB No Instances: {op}@{action_date}"
+      op: delete
+      days: 14
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "ELB - No Instances Attached - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "No Instances Are Attached To ELB:"
+      action_desc: "Actions Taken:  Marked for deletion in 14 days"
+      to:
+         - CloudCustodian@company.com
+      transport:
+           type: sqs
+           queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+           region: us-east-1
+
+
+- name: elb-unmark-if-in-use
+  resource: elb
+  description: |
+    Remove Delete tag from any elb which has 
+    instances attached so it doesn't get
+    deleted during cleanup
+  filters:
+    - "tag:maid_status": not-null
+    - not:
+          - Instances: []
+  actions:
+    - type: remove-tag
+      tags: [maid_status]
+
+
+- name: elb-delete-unused
+  resource: elb
+  description: |
+    Delete any marked ELB which has no instances attached
+    if it has been that way for 14 days or more.
+  filters:
+    - type: marked-for-op
+      op: delete
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "ELB - Deleted Stale ELB - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "No Instances Are Attached To ELB for over 14 days:"
+      action_desc: "Actions Taken:  The ELB has been deleted"
+      to:
+         - CloudCustodian@company.com
+      transport:
+           type: sqs
+           queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+           region: us-east-1
+
+
+#########################
+#####  EBS Policies #####
+#########################
+
+
+- name: ec2-daily-backup
+  resource: ec2
+  description: |
+    Creates a snapshot of every EBS volume nightly when
+    custodian runs its full scan
+  actions:
+   - type: snapshot
+     copy-tags:
+       - Owner
+       - "Resource Contact"
+       - Environment
+       - "Billing Cost Center"
+       - Name
+
+
+- name: delete-old-snapshots
+  resource: ebs-snapshot
+  description: |
+    Deletes a snapshot if its older than 10 days
+  filters:
+   - type: age
+     days: 10
+     op: ge
+  actions:
+   - delete
+
+
+- name: ebs-mark-unattached-deletion
+  resource: ebs
+  description: |
+    Mark any unattached EBS volumes for deletion in 60 days.
+    This will clean up old unused orphaned volumes that customers forget to delete.
+  filters:
+    - "tag:maid_status": absent
+    - State: available
+  actions:
+    - type: mark-for-op
+      op: delete
+      days: 60
+
+
+- name: ebs-unmark-attached-deletion
+  resource: ebs
+  description: |
+    Unmark any attached EBS volumes that were scheduled for deletion
+    if they are currently attached to an instance
+  filters:
+    - State: in-use
+    - "tag:maid_status": not-null
+  actions:
+    - unmark
+
+
+
+- name: ebs-delete-marked
+  resource: ebs
+  description: |
+    Delete any unattached EBS volumes that were scheduled for deletion 60 days prior and notify
+  filters:
+    - type: marked-for-op
+      op: delete
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "EBS - Unattached Volumes Deleted - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "EBS Volumes Which Have Been Unattached For 60 Days:"
+      action_desc: "Actions Taken:  EBS Volumes Deleted"
+      to:
+        - CloudCustodian@company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+#########################
+#####  RDS Policies #####
+#########################
+
+
+- name: rds-auto-tag-owner
+  description: |
+    Tags any newly created RDS with OwnerName identifier
+  resource: rds
+  mode:
+    type: cloudtrail
+    events:
+      - CreateDBInstance
+  filters:
+   - "tag:OwnerName": absent
+  actions:
+   - type: tag
+     key: OwnerName
+     value: OwnerName
+
+
+- name: rds-unencrypted-public-remediate
+  description: |
+    Terminate all unencrypted or encrypted with non- KMS Key
+    or publicly available RDS upon their creation and notify
+  resource: rds
+  mode:
+    type: cloudtrail
+    events:
+      - CreateDBInstance
+  filters:
+    - or:
+        - StorageEncrypted: false
+        - PubliclyAccessible: true
+        - type: kms-alias
+          key: AliasName
+          value: '^(alias/aws/)'
+          op: regex
+  actions:
+    - type: delete
+      skip-snapshot: true
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "RDS - New Database Terminated - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "RDS Instance Is Either Not Encrypted With  KMS Key or Is Publicly Accessible:"
+      action_desc: "Actions Taken:  RDS Instance Terminated"
+      to:
+        - CloudCustodian@company.com
+        #- event-owner
+      transport:
+                type: sqs
+                queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+                region: us-east-1
+
+
+
+- name: rds-unencrypted-public
+  description: |
+    Notified on all unencrypted or encrypted with non- KMS Key or publicly available RDS instances
+  resource: rds
+  filters:
+    - or:
+        - StorageEncrypted: false
+        - PubliclyAccessible: true
+        - type: kms-alias
+          key: AliasName
+          value: '^(alias/aws/)'
+          op: regex
+  actions:
+   - type: notify
+     template: default.html
+     priority_header: 2
+     subject: "RDS - Existing DB is Open or not Encypted - [custodian {{ account }} - {{ region }}]" 
+     violation_desc: "RDS Instance(s) Are Either Not Encrypted With  KMS Key or Are Publicly Accessible:"
+     action_desc: "Actions Taken:  Notification Action Only"
+     to:
+       - CloudCustodian@company.com
+       #- resource-owner
+     transport:
+       type: sqs
+       queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+       region: us-east-1
+
+
+
+- name: rds-prd-multi-az-remediate
+  resource: rds
+  description: |
+    Notify on all Prod RDS Instances that are Not Multi AZ setup.
+  mode:
+    type: cloudtrail
+    events:
+      - CreateDBInstance
+  filters:
+    - type: value
+      key: 'tag:Environment'
+      value: '^pro?d'
+      op: regex
+    - MultiAZ: false
+  actions:
+   - type: notify
+     template: default.html
+     priority_header: 2
+     subject: "RDS - Prod DB Is Not MultiAZ - [custodian {{ account }} - {{ region }}]" 
+     violation_desc: "RDS Instance Is Tagged As Prod But Not MultiAZ:"
+     action_desc: "Actions Taken:  Notification Only"
+     to:
+       - CloudCustodian@company.com
+       #- event-owner
+     transport:
+       type: sqs
+       queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+       region: us-east-1
+
+
+
+- name: rds-db-instance-snapshot-hourly
+  mode:
+    type: periodic
+    schedule: "rate(1 hour)"
+  resource: rds
+  description: |
+    Creates a Hourly Cron Scheduled CWEvent to
+    Snapshot single non-cluster RDS Instances hourly if tagged with
+    key: Backup and value: HOURLY
+  filters:
+    - "tag:Backup": HOURLY
+  actions:
+    - snapshot
+
+
+- name: rds-cluster-snapshot-hourly
+  mode:
+    type: periodic
+    schedule: "rate(1 hour)"
+  resource: rds-cluster
+  description: |
+    Creates a Hourly Cron Scheduled CWEvent to
+    Snapshot RDS clusters hourly if tagged with
+    key: Backup and value: HOURLY
+  filters:
+    - "tag:Backup": HOURLY
+  actions:
+    - snapshot
+
+
+
+- name: rds-db-instance-snapshot-weekly
+  mode:
+    type: periodic
+    schedule: "rate(7 days)"
+  resource: rds
+  description: |
+    Creates a Weekly Cron Scheduled CWEvent to
+    Snapshot single non-cluster RDS Instances weekly if tagged
+    with key: Backup with value: WEEKLY
+  filters:
+    - "tag:Backup": WEEKLY
+  actions:
+    - snapshot
+
+
+
+- name: rds-cluster-snapshot-weekly
+  mode:
+    type: periodic
+    schedule: "rate(7 days)"
+  resource: rds-cluster
+  description: |
+    Creates a Weekly Cron Scheduled CWEvent to
+    Snapshot RDS clusters Weekly if tagged with
+    key: Backup and value: WEEKLY
+  filters:
+    - "tag:Backup": WEEKLY
+  actions:
+    - snapshot
+
+
+
+- name: rds-db-instance-backup-tag-missing
+  resource: rds
+  description: |
+    If Backup tag is missing one is created like- Backup: DAILY.
+  filters:
+    - "tag:Backup": absent
+  actions:
+    - type: tag
+      key: Backup
+      value: "DAILY"
+
+
+
+- name: rds-db-instance-snapshot-daily
+  mode:
+    type: periodic
+    schedule: "rate(1 day)"
+  resource: rds
+  description: |
+    Snapshot RDS Instances that have a Backup tag of Backup: DAILY.
+  filters:
+    - "tag:Backup": DAILY
+  actions:
+    - snapshot
+
+
+
+- name: rds-cluster-snapshot-daily
+  mode:
+    type: periodic
+    schedule: "rate(1 day)"
+  resource: rds-cluster
+  description: |
+    Snapshots RDS clusters that are tagged with Backup: DAILY.
+  filters:
+         - "tag:Backup": DAILY
+  actions:
+    - snapshot
+
+
+- name: rds-snapshot-delete-stale
+  resource: rds-snapshot
+  description: |
+    Deletes RDS single instance snapshots of age 10 days or older.
+  filters:
+   - type: age
+     days: 10
+     op: ge
+  actions:
+   - delete
+
+
+- name: rds-cluster-snapshot-delete-stale
+  resource: rds-cluster-snapshot
+  description: |
+    Deletes RDS cluster snapshots of age 10 days or older.
+  filters:
+   - type: age
+     days: 10
+     op: gt
+  actions:
+   - delete
+
+
+################################
+#####    S3 Policies  ##########
+################################
+
+- name: s3-global-acl-Remediate
+  resource: s3
+  description: |
+    Remediates and notifies on S3 bucket ACL changes that have Global ACLs
+  mode:
+     type: cloudtrail
+     events:
+        - source: 's3.amazonaws.com'
+          event: PutBucketAcl
+          ids: "requestParameters.bucketName"
+  filters:
+    - type: global-grants
+  actions:
+    - type: delete-global-grants
+      grantees:
+        - "http://acs.amazonaws.com/groups/global/AllUsers"
+        - "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "S3 - Invalid Global ACL on New Bucket - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "S3 Bucket Has Public S3 Bucket ACLs:"
+      action_desc: "Actions Taken:  Public ACLs Removed"
+      to:
+        - CloudCustodian@company.com
+        #- event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+- name: s3-enable-versioning
+  resource: s3
+  description: |
+    If versioning is not turned on, this enables it for the bucket
+  filters:
+    - or:
+      - type: value
+        key: Versioning.Status
+        value: Suspended
+      - type: value
+        key: Versioning.Status
+        value: absent
+  actions:
+    - type: toggle-versioning
+      enabled: true
+
+
+
+- name: s3-cross-account-access-check
+  resource: s3
+  filters:
+    - type: cross-account
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "S3 - Cross-Account Access Enabled - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "S3 Bucket Can Be Access From Other Accounts or External IPs:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - CloudCustodian@company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+#########################################
+#####  Login Events #####################
+#########################################
+
+- name: root-login-detected
+  resource: account
+  description: |
+    Notifies on root user logins
+  mode:
+     type: cloudtrail
+     events:
+        - source: signin.amazonaws.com
+          event: ConsoleLogin
+          ids: "userIdentity.arn"
+  filters:
+    - type: event
+      key: "detail.userIdentity.type"
+      value_type: swap
+      op: in
+      value: Root
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "Acccount - Root Login Detected - [custodian {{ account }} - {{ region }}]"
+      violation_desc: "The Root User has logged in:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - CloudCustodian@company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
+
+
+- name: invalid-external-login-detected
+  resource: account
+  description: |
+    Notifies on invalid external IP console logins
+  mode:
+     type: cloudtrail
+     events:
+        - source: signin.amazonaws.com
+          event: ConsoleLogin
+          ids: "userIdentity.arn"
+  filters:
+    - not:
+          ### Generate the Regex for IPs Here http://www.analyticsmarket.com/freetools/ipregex
+        - type: event
+          key: 'detail.sourceIPAddress'
+          value: '^((175\.123\.|168\.121\.|191\.32\.)([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))|(10\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))|(192\.8\.155\.2([1-9]|[1-9][0-9]|[1-9][0-9][0-9]))$'
+          op: regex
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "Acccount - External Login Detected - [custodian {{ account }} - {{ region }}]"
+      violation_desc: "A User Has Logged In Externally From Invalid IP:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - CloudCustodian@company.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789011/cloud-custodian-mailer
+        region: us-east-1
