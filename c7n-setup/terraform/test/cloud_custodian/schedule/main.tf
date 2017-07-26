@@ -8,7 +8,7 @@ resource "aws_cloudwatch_event_rule" "custodian_scheduler" {
 }
 
 
-resource "cloudwatch_event_target" "AGT-Custodian-WorkInserter" {
+resource "aws_cloudwatch_event_target" "Custodian-WorkInserter" {
   rule      = "${aws_cloudwatch_event_rule.custodian_scheduler.name}"
   arn       = "arn:aws:lambda:us-east-1:<ACCOUNT-NUMBER>:function:Custodian-WorkInserter"
 }
