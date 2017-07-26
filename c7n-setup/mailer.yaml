@@ -1,0 +1,26 @@
+debug: True
+queue_url: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+
+from_address: CloudCustodian@company.com
+
+#contact_tags:
+ # - OwnerContact
+ # - OwnerEmail
+ # - SNSTopicARN
+
+## - LAMBDA CONFIG SETTINGS BELOW.  
+## - Subnets and sgs are only needed if running lambda inside VPC mode which is only needed if reacing into interal LDPA SMTP stuff
+region: us-east-1
+role: arn:aws:iam::<ACCOUNT-NUMBER-HERE>:role/Cloud_Custodian_Role
+timeout: 300
+
+#subnets:
+ # - subnet-1234563 # for ldap lookups
+  #- subnet-1246865  # for ldap looups
+  #- subnet-1276544  # for ldap looups
+#security_groups:
+ # - sg-34641ff5
+  #- sg-ft34y564
+
+
+
