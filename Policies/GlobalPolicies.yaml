@@ -2,7 +2,7 @@ policies:
 
 - name: flow-mis-configured
   resource: vpc
-  comments: |
+  description: |
     Checks to see if the Flow Logs are 
     enabled and setup for all traffic and notifies.
   filters:
@@ -13,6 +13,7 @@ policies:
          op: equal
          traffic-type: all
          log-group: VPCFlowLogs
+         status: success
   actions:
     - type: notify
       template: default.html
@@ -21,17 +22,17 @@ policies:
       violation_desc: "The Following Flow Logs Are Invalid:"
       action_desc: "Actions Taken:  Notification Only"
       to:
-        - Email@Company.com
+        - CloudCustodian@YourCompany.com
       transport:
         type: sqs
-        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
         region: us-east-1
 
 
 
 - name: account-cloudtrail-enabled
   resource: account
-  comments: |
+  description: |
     Checks to make sure CloudTrail is enabled on the account
     for all regions and notifies.
   filters:
@@ -39,6 +40,7 @@ policies:
        global-events: false
        multi-region: false
        running: false
+       file-digest: false
   actions:
         - type: notify
           template: default.html
@@ -47,17 +49,17 @@ policies:
           violation_desc: "The Following Account's CloudTrail Is Not Configured Properly:"
           action_desc: "Actions Taken:  Notification Only"
           to:
-                - Email@Company.com
+                - CloudCustodian@YourCompany.com
           transport:
                 type: sqs
-                queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+                queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
                 region: us-east-1
 
 
 
 - name: password-policy-check
   resource: account
-  comments: |
+  description: |
     Verifies password policy on account 
     meets our requirements and notifies if not
   region: us-east-1
@@ -100,12 +102,91 @@ policies:
       violation_desc: "The Following Account's IAM Password Policy Does Not Meet Standards"
       action_desc: "Actions Taken:  Notification Only"
       to:
-        - Email@Company.com
+        - CloudCustodian@YourCompany.com
       transport:
         type: sqs
-        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
         region: us-east-1
 
+
+- name: iam-passwords-needing-changed
+  resource: iam-user
+  description: |
+    Finds all IAM User passwords that have
+    not been changed in over 90 days and notifies
+  filters:
+    - type: credential
+      key: password_last_changed
+      value_type: age
+      value: 90
+      op: greater-than
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "IAM - Passwords Over 90 Days Found - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "The Following Account's IAM Passwords Are Over 90 Days Old"
+      action_desc: "Actions Taken:  Notification Only"
+      to:
+        - CloudCustodian@YourCompany.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: iam-stale-users
+  resource: iam-user
+  description: |
+    Finds all IAM Users that have
+    not logged in for over 60 days and notifies
+  filters:
+    - type: credential
+      key: password_last_used
+      value_type: age
+      value: 60
+      op: greater-than
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "IAM - Stale/Unused Passwords Found - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "The Following Account's IAM Passwords Have Not Been Used In over 60 days"
+      action_desc: "Actions Taken:  Notification Only"
+      to:
+        - CloudCustodian@YourCompany.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: iam-old-access-keys
+  resource: iam-user
+  description: |
+    Finds all IAM Access Keys that have
+    not been changed in over 90 days and notifies
+  filters:
+    - type: credential
+      key: access_keys.last_rotated
+      value_type: age
+      value: 90
+      op: greater-than
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "IAM - Access Keys Over 90 Days Old Found - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "The Following Access Keys Are Over 90 Days Old"
+      action_desc: "Actions Taken:  Notification Only"
+      to:
+        - CloudCustodian@YourCompany.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
+        region: us-east-1
 
 
 
@@ -127,10 +208,10 @@ policies:
         violation_desc: "The Following Account Is Missing a MFA On Root User:"
         action_desc: "Actions Taken:  Notify Only"
         to:
-          - Email@Company.com
+          - CloudCustodian@YourCompany.com
         transport:
           type: sqs
-          queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+          queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
           region: us-east-1
 
 
@@ -153,18 +234,19 @@ policies:
         violation_desc: "The Following Account Has Root Access Keys Still Present:"
         action_desc: "Actions Taken:  Notify Only"
         to:
-          - Email@Company.com
+          - CloudCustodian@YourCompany.com
         transport:
           type: sqs
-          queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+          queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
           region: us-east-1
+
 
 
 
 ######  S3 Policies ######
 ##########################
 
-- name: agt-s3-global-acl
+- name: s3-global-acl
   resource: s3
   description: |
     Notifies on all currently existing S3 buckets that have Global ACLs
@@ -178,8 +260,70 @@ policies:
       violation_desc: "The Following Existing S3 Buckets Have Public S3 Bucket ACLs:"
       action_desc: "Actions Taken:  Notification Action Only"
       to:
-        - Email@Company.com
+        - CloudCustodian@YourCompany.com
       transport:
         type: sqs
-        queue: https://sqs.us-east-1.amazonaws.com/<ACCOUNT-NUMBER-HERE>/cloud-custodian-mailer
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
+        region: us-east-1
+
+- name: s3-enable-versioning
+  resource: s3
+  description: |
+    If versioning is not turned on, this enables it for the bucket
+  filters:
+    - or:
+      - type: value
+        key: Versioning.Status
+        value: Suspended
+      - type: value
+        key: Versioning.Status
+        value: absent
+  actions:
+    - type: toggle-versioning
+      enabled: true
+
+
+
+- name: s3-cross-account-access-check
+  resource: s3
+  filters:
+    - type: cross-account
+  actions:
+    - type: notify
+      template: default
+      priority_header: 2
+      subject: "S3 - Cross-Account Access Enabled - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "S3 Bucket Can Be Access From Other Accounts or External IPs:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - CloudCustodian@YourCompany.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
+        region: us-east-1
+
+
+###############################################
+########  Service Limits ######################
+###############################################
+
+- name: iam-service-limits
+  resource: account
+  filters:
+   - type: service-limit
+     services:
+      - IAM
+     threshold: 1.0
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 2
+      subject: "Acccount - IAM Limits - [custodian {{ account }} - {{ region }}]"
+      violation_desc: "IAM Services At Limit:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - CloudCustodian@YourCompany.com
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
         region: us-east-1
