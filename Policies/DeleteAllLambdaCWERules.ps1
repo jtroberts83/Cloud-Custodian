@@ -15,7 +15,7 @@ $PasswordCount = 0
 $LatestAviatrix = @()
 $LatestPublic = @()
 
-
+## YOU WILL NEED TO DOWNLOAD curl.exe to C:\temp directory or change this code to use whatever method you prefer to get the instance creds.
 
 Write-Host "Getting Temp Creds Now......" -ForegroundColor Yellow
 $Role = $null
