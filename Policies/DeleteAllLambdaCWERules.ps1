@@ -88,6 +88,37 @@ function DeleteLambda($Account)
 ###########################################################################################################################################################
 ###########################################################################################################################################################
 ###########################################################################################################################################################
+function DeleteConfigRules($Account)
+{
+    foreach($Region in $RegionsArray)
+    { 
+        $AllConfigs = $null
+	$AllConfigs = (Get-CFGConfigRule -Region $Region -AccessKey $AccessKey -SecretKey $SecretAccessKey -SessionToken $SessionToken).ConfigRuleName
+        foreach($Config in $AllConfigs)
+        {
+            if($Config -like "custodian-*")
+            {
+                Try
+                {
+                    Remove-CFGConfigRule -ConfigRuleName $Config -Force -Region $Region -AccessKey $AccessKey -SecretKey $SecretAccessKey -SessionToken $SessionToken -ErrorAction Stop
+                    Write-Host "Deleted Config Rule $Config from $Account $Region" -ForegroundColor Green
+                }
+                Catch
+                {
+                    Write-Host "Error Deleting Config Rule $Config  from $Account $Region $_" -ForegroundColor Red
+
+                }
+            }
+        }
+    }
+}
+
+
+
+
+###########################################################################################################################################################
+###########################################################################################################################################################
+###########################################################################################################################################################
 function DeleteCWERule($Account)
 {
     foreach($Region in $RegionsArray)
@@ -240,6 +271,21 @@ foreach($Account in $Accounts)
             {
                 Write-Host "     Found Instances in this account" -ForegroundColor Green
             }
+	    
+	    
+	    $Found = DeleteConfigRules $AccountID 
+            if(!($Found))
+            {
+                Write-Host "     No CWEvent Rules Found in this account" -ForegroundColor Yellow
+            }
+            else
+            {
+                Write-Host "     Found Instances in this account" -ForegroundColor Green
+            }
+	    
+	    
+	    
+	    
     }
 }
 
