@@ -1,0 +1,49 @@
+debug: True
+queue_url: https://sqs.us-east-1.amazonaws.com/969859503720/agt-cloud-custodian-mailer
+
+from_address: AGTCloudCustodian@Transamerica.com
+
+#contact_tags:
+ # - OwnerContact
+ # - OwnerEmail
+ # - SNSTopicARN
+
+
+## For Lambda Mailer function setup
+region: us-east-1
+role: arn:aws:iam::XXXXXXXXXX:role/Cloud_Custodian_Role
+timeout: 300
+subnets:
+  - subnet-XXXXXXXX # for ldap lookups
+  - subnet-XXXXXXXX  # for ldap looups
+  - subnet-XXXXXXXX  # for ldap looups
+security_groups:
+  - sg-XXXXXXXX
+  - sg-XXXXXXXX
+
+## Define SES Region to use for mailer
+ses_region: us-east-1
+
+## Define caching Engine - Using AWS ElasticCache Redis in this case
+cache_engine: redis
+redis_host: 'c7n-redis-001.XXXXXXX.0001.use1.cache.amazonaws.com'
+redis_port: 6379
+
+
+## Proxy if needed
+http_proxy: http://USER:PASS@cr-proxy.us.aegon.com:9090
+https_proxy: http://USER:PASS@cr-proxy.us.aegon.com:9090
+
+
+## Internal LDAP Settings
+ldap_uri: "ldap://prod-vd.domain.domain.com:389"
+ldap_bind_dn: "DC=Combined,DC=Global"
+ldap_bind_user: LDAPUSER
+ldap_bind_password: LDAPPASS
+ldap_bind_password_in_kms: False
+ldap_uid_attribute: sAMAccountName
+ldap_email_key: mail
+ldap_manager_attribute: manager
+
+ldap_uid_tags:
+  - CreatorName
