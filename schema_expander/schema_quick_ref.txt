@@ -1,0 +1,510 @@
+Cloud Custodian Quick Reference for custodian build 0.8.26.0
+
+account:
+  actions: [enable-cloudtrail, invoke-lambda, notify, put-metric, request-limit-increase]
+  filters: [and, check-cloudtrail, check-config, credential, event, has-virtual-mfa,
+    iam-summary, not, or, password-policy, service-limit, value]
+
+acm-certificate:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+alarm:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+ami:
+  actions: [auto-tag-user, deregister, invoke-lambda, mark, mark-for-op, normalize-tag,
+    notify, put-metric, remove-launch-permissions, remove-tag, rename-tag, tag, tag-trim,
+    unmark, untag]
+  filters: [and, event, image-age, marked-for-op, not, or, tag-count, unused, value]
+
+app-elb:
+  actions: [delete, invoke-lambda, mark-for-op, modify-listener, notify, put-metric,
+    remove-tag, set-s3-logging, tag]
+  filters: [and, default-vpc, event, healthcheck-protocol-mismatch, is-logging, is-not-logging,
+    listener, marked-for-op, network-location, not, or, security-group, subnet, tag-count,
+    target-group, value]
+
+app-elb-target-group:
+  actions: [invoke-lambda, mark-for-op, notify, put-metric, remove-tag, tag]
+  filters: [and, default-vpc, event, marked-for-op, not, or, tag-count, value]
+
+asg:
+  actions: [auto-tag-user, delete, invoke-lambda, mark, mark-for-op, notify, propagate-tags,
+    put-metric, remove-tag, rename-tag, resize, resume, suspend, tag, tag-trim, unmark,
+    untag]
+  filters: [and, capacity-delta, event, image-age, invalid, launch-config, marked-for-op,
+    metrics, network-location, not, not-encrypted, offhour, onhour, or, security-group,
+    subnet, tag-count, valid, value, vpc-id]
+
+batch-compute:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+batch-definition:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+cache-cluster:
+  actions: [auto-tag-user, delete, invoke-lambda, mark, mark-for-op, modify-security-groups,
+    notify, put-metric, remove-tag, snapshot, tag, unmark, untag]
+  filters: [and, event, marked-for-op, metrics, network-location, not, or, security-group,
+    subnet, tag-count, value]
+
+cache-snapshot:
+  actions: [auto-tag-user, copy-cluster-tags, delete, invoke-lambda, mark, mark-for-op,
+    notify, put-metric, remove-tag, tag, unmark, untag]
+  filters: [age, and, event, marked-for-op, not, or, tag-count, value]
+
+cache-subnet-group:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+cfn:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+cloud-directory:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+cloudsearch:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+cloudtrail:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+codebuild:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+codecommit:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+codepipeline:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+customer-gateway:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+datapipeline:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+directconnect:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+directory:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+distribution:
+  actions: [auto-tag-user, disable, invoke-lambda, mark, mark-for-op, notify, put-metric,
+    remove-tag, set-protocols, tag, unmark, untag]
+  filters: [and, event, marked-for-op, metrics, not, or, tag-count, value]
+
+dynamodb-stream:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+dynamodb-table:
+  actions: [delete, invoke-lambda, mark-for-op, notify, put-metric, remove-tag, tag]
+  filters: [and, event, marked-for-op, metrics, not, or, value]
+
+ebs:
+  actions: [auto-tag-user, copy-instance-tags, delete, encrypt-instance-volumes, invoke-lambda,
+    mark, mark-for-op, modify, normalize-tag, notify, put-metric, remove-tag, rename-tag,
+    snapshot, tag, tag-trim, unmark, untag]
+  filters: [and, event, fault-tolerant, health-event, instance, kms-alias, marked-for-op,
+    metrics, modifyable, not, or, tag-count, value]
+
+ebs-snapshot:
+  actions: [auto-tag-user, copy, delete, invoke-lambda, mark, mark-for-op, normalize-tag,
+    notify, put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [age, and, cross-account, event, marked-for-op, not, or, skip-ami-snapshots,
+    tag-count, value]
+
+ec2:
+  actions: [auto-tag-user, autorecover-alarm, invoke-lambda, mark, mark-for-op, modify-security-groups,
+    normalize-tag, notify, put-metric, remove-tag, rename-tag, resize, set-instance-profile,
+    snapshot, start, stop, tag, tag-trim, terminate, unmark, untag]
+  filters: [and, default-vpc, ebs, ephemeral, event, health-event, image, image-age,
+    instance-age, instance-uptime, marked-for-op, metrics, network-location, not,
+    offhour, onhour, or, security-group, singleton, state-age, subnet, tag-count,
+    value]
+
+ecr:
+  actions: [invoke-lambda, notify, put-metric, remove-statements]
+  filters: [and, cross-account, event, not, or, value]
+
+ecs:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+efs:
+  actions: [auto-tag-user, delete, invoke-lambda, mark, mark-for-op, notify, put-metric,
+    remove-tag, tag, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+efs-mount-target:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+elasticbeanstalk:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+elasticsearch:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+elb:
+  actions: [auto-tag-user, delete, disable-s3-logging, enable-s3-logging, invoke-lambda,
+    mark-for-op, modify-security-groups, notify, put-metric, remove-tag, set-ssl-listener-policy,
+    tag]
+  filters: [and, default-vpc, event, healthcheck-protocol-mismatch, instance, is-logging,
+    is-not-logging, is-ssl, marked-for-op, metrics, network-location, not, or, security-group,
+    ssl-policy, subnet, tag-count, value]
+
+emr:
+  actions: [invoke-lambda, mark-for-op, notify, put-metric, remove-tag, tag, terminate]
+  filters: [and, event, marked-for-op, metrics, not, or, value]
+
+eni:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, modify-security-groups,
+    normalize-tag, notify, put-metric, remove-tag, rename-tag, tag, tag-trim, unmark,
+    untag]
+  filters: [and, event, flow-logs, marked-for-op, network-location, not, or, security-group,
+    subnet, tag-count, value]
+
+event-rule:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+firehose:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+gamelift-build:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+gamelift-fleet:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+glacier:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, notify, put-metric, remove-tag,
+    tag, unmark, untag]
+  filters: [and, cross-account, event, marked-for-op, not, or, tag-count, value]
+
+health-event:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+healthcheck:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, notify, put-metric, remove-tag,
+    tag, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+hostedzone:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, notify, put-metric, remove-tag,
+    tag, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+hsm:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+hsm-client:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+hsm-hapg:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+iam-certificate:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+iam-group:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, has-inline-policy, has-users, not, or, value]
+
+iam-policy:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, has-allow-all, not, or, unused, used, value]
+
+iam-profile:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, unused, used, value]
+
+iam-role:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, has-inline-policy, has-specific-managed-policy, no-specific-managed-policy,
+    not, or, unused, used, value]
+
+iam-user:
+  actions: [delete, invoke-lambda, notify, put-metric, remove-keys]
+  filters: [access-key, and, credential, event, group, mfa-device, not, or, policy,
+    value]
+
+identity-pool:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+internet-gateway:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+iot:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+key-pair:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+kinesis:
+  actions: [auto-tag-user, delete, invoke-lambda, mark, mark-for-op, notify, put-metric,
+    remove-tag, tag, unmark, untag]
+  filters: [and, event, marked-for-op, metrics, not, or, tag-count, value]
+
+kinesis-analytics:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+kms:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, cross-account, event, grant-count, not, or, value]
+
+kms-key:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, cross-account, event, key-rotation-status, not, or, value]
+
+lambda:
+  actions: [auto-tag-user, delete, invoke-lambda, mark-for-op, notify, put-metric,
+    remove-statements, remove-tag, tag]
+  filters: [and, cross-account, event, event-source, marked-for-op, metrics, network-location,
+    not, or, security-group, subnet, value]
+
+launch-config:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [age, and, event, not, or, unused, value]
+
+log-group:
+  actions: [delete, invoke-lambda, notify, put-metric, retention]
+  filters: [and, event, last-write, metrics, not, or, value]
+
+ml-model:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+nat-gateway:
+  actions: [auto-tag-user, delete, invoke-lambda, mark, mark-for-op, normalize-tag,
+    notify, put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+network-acl:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, s3-cidr, subnet, tag-count, value]
+
+network-addr:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+opswork-cm:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+opswork-stack:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+peering-connection:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, missing-route, not, or, tag-count, value]
+
+r53domain:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+rds:
+  actions: [auto-patch, auto-tag-user, delete, invoke-lambda, mark, mark-for-op, modify-security-groups,
+    notify, put-metric, remove-tag, resize, retention, snapshot, start, stop, tag,
+    tag-trim, unmark, upgrade]
+  filters: [and, db-parameter, default-vpc, event, health-event, kms-alias, marked-for-op,
+    metrics, network-location, not, offhour, onhour, or, security-group, subnet, tag-count,
+    upgrade-available, value]
+
+rds-cluster:
+  actions: [delete, invoke-lambda, mark, mark-for-op, notify, put-metric, remove-tag,
+    retention, snapshot, tag, unmark]
+  filters: [and, event, marked-for-op, metrics, network-location, not, or, security-group,
+    subnet, tag-count, value]
+
+rds-cluster-param-group:
+  actions: [copy, delete, invoke-lambda, modify, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+rds-cluster-snapshot:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [age, and, event, not, or, value]
+
+rds-param-group:
+  actions: [copy, delete, invoke-lambda, modify, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+rds-snapshot:
+  actions: [delete, invoke-lambda, mark-for-op, notify, put-metric, region-copy, remove-tag,
+    restore, tag, unmark]
+  filters: [age, and, cross-account, event, latest, marked-for-op, not, onhour, or,
+    value]
+
+rds-subnet-group:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+rds-subscription:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+redshift:
+  actions: [delete, enable-vpc-routing, invoke-lambda, mark-for-op, modify-security-groups,
+    notify, put-metric, remove-tag, retention, snapshot, tag, tag-trim, unmark]
+  filters: [and, default-vpc, event, marked-for-op, metrics, network-location, not,
+    or, param, security-group, subnet, value]
+
+redshift-snapshot:
+  actions: [delete, invoke-lambda, mark-for-op, notify, put-metric, remove-tag, tag,
+    unmark]
+  filters: [age, and, event, marked-for-op, not, or, value]
+
+redshift-subnet-group:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+rest-api:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+route-table:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, route, subnet, tag-count, value]
+
+rrset:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+s3:
+  actions: [attach-encrypt, auto-tag-user, delete, delete-global-grants, encrypt-keys,
+    encryption-policy, invoke-lambda, mark-for-op, no-op, notify, put-metric, remove-statements,
+    remove-website-hosting, set-inventory, tag, toggle-logging, toggle-versioning,
+    unmark]
+  filters: [and, cross-account, event, global-grants, has-statement, is-log-target,
+    marked-for-op, metrics, missing-policy-statement, missing-statement, no-encryption-statement,
+    not, or, value]
+
+security-group:
+  actions: [auto-tag-user, delete, invoke-lambda, mark, mark-for-op, normalize-tag,
+    notify, patch, put-metric, remove-permissions, remove-tag, rename-tag, tag, tag-trim,
+    unmark, untag]
+  filters: [and, default-vpc, diff, egress, event, ingress, locked, marked-for-op,
+    not, or, stale, tag-count, unused, used, value]
+
+shield-attack:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+shield-protection:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+simpledb:
+  actions: [delete, invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+snowball:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+snowball-cluster:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+sns:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, cross-account, event, metrics, not, or, value]
+
+sqs:
+  actions: [delete, invoke-lambda, notify, put-metric, set-encryption]
+  filters: [and, cross-account, event, metrics, not, or, value]
+
+step-machine:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+storage-gateway:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+streaming-distribution:
+  actions: [auto-tag-user, disable, invoke-lambda, mark, mark-for-op, notify, put-metric,
+    remove-tag, tag, unmark, untag]
+  filters: [and, event, marked-for-op, metrics, not, or, tag-count, value]
+
+subnet:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, flow-logs, marked-for-op, not, or, tag-count, value]
+
+support-case:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+user-pool:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, not, or, value]
+
+vpc:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, flow-logs, marked-for-op, not, or, security-group, tag-count,
+    value]
+
+vpc-endpoint:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+vpn-connection:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+vpn-gateway:
+  actions: [auto-tag-user, invoke-lambda, mark, mark-for-op, normalize-tag, notify,
+    put-metric, remove-tag, rename-tag, tag, tag-trim, unmark, untag]
+  filters: [and, event, marked-for-op, not, or, tag-count, value]
+
+waf:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
+
+waf-regional:
+  actions: [invoke-lambda, notify, put-metric]
+  filters: [and, event, metrics, not, or, value]
