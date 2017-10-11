@@ -1,3 +1,5 @@
+accounts:
+
 - account_id: '<Account_Number>'
   name: <Account_Name>
   regions:
