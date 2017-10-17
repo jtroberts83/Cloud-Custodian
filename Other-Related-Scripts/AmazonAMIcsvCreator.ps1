@@ -1,3 +1,64 @@
+##  Script Created by Jamison Roberts 2017
+##  
+##  I recommend running this script on a Windows EC2 instance in your main AWS account and region.
+##  Set up a Task Scheduler task to run the script daily to keep the AmazonAMIs.csv file up-to-date
+##
+##  The script does the following:
+##
+##  	- Gets temp credentials from the local instance and then uses those to gain further access through STS assumed Creds
+##  	- Downloads a csv from S3 which contains a list of all your account numbers you want to run against. (If you have this file)
+##  	- Scans each account and region for Amazon owned AMIs and builds an array of them as it finds them
+##  	- That AMI array is then saved out to a csv file in C:\temp and uploaded to the S3 bucket specified
+##  	- You will most likely need to customize this script based on your environment.
+##
+##  This script was designed to create this AMI CSV file for use with the below Cloud Custodian policies but could be used for other cases
+##
+## - name: ec2-tag-stateless-instance-at-launch
+##   resource: ec2
+##     description: |
+##         This policy is triggered on new ec2 instances. If the instance is missing the LoadType tag AND 
+##         is using an amazon AMI then it tags the instance with LoadType: stateless
+##     mode:
+##       type: cloudtrail
+##       events:
+##         - RunInstances
+##     filters:
+##       - tag:LoadType: absent
+##       - type: value
+##         key: "ImageId"
+##         op: in
+##         value_from:
+##            url: s3://somes3bucket/CloudCustodian/AmazonLinuxAMIs.csv
+##            format: csv2dict
+##     actions:
+##       - type: tag
+##         key: LoadType
+##         value: stateless
+##
+## - name: ec2-tag-stateful-instance-at-launch
+##   resource: ec2
+##     description: |
+##      This policy is triggered on new ec2 instances. If the instance is missing the LoadType tag AND 
+##      is NOT using an amazon AMI then it tags the instance with LoadType: stateful
+##     mode:
+##       type: cloudtrail
+##       events:
+##         - RunInstances
+##     filters:
+##       - tag:LoadType: absent
+##       - type: value
+##         key: "ImageId"
+##         op: not-in
+##         value_from:
+##            url: s3://somes3bucket/CloudCustodian/AmazonLinuxAMIs.csv
+##            format: csv2dict
+##     actions:
+##       - type: tag
+##         key: LoadType
+##         value: stateful
+##
+
+
 Write-Host "##################################################################`n`nPlease wait.......Loading AWS Powershell Tools Module..........`n`n##################################################################" -ForegroundColor Green
 Import-Module "C:\Program Files (x86)\AWS Tools\PowerShell\AWSPowerShell\AWSPowerShell.psd1"
 
