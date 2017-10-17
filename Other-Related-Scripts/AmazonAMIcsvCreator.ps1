@@ -1,6 +1,7 @@
 ##  Script Created by Jamison Roberts 2017
 ##  
 ##  I recommend running this script on a Windows EC2 instance in your main AWS account and region.
+##  The instance needs to have a Instance Profile Role attached with perms to STS etc
 ##  Set up a Task Scheduler task to run the script daily to keep the AmazonAMIs.csv file up-to-date
 ##
 ##  The script does the following:
