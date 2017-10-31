@@ -1,0 +1,205 @@
+vars:
+  tag-filters: &tag-compliance-filters
+        - "tag:Resource Contact": absent
+        - "tag:Billing Cost Center": absent
+        - "tag:Environment": absent
+        - "tag:Resource Purpose": absent
+        - "tag:Business Unit": absent
+
+policies:
+
+
+- name: ec2-tag-compliance-mark
+  resource: ec2
+  mode:
+      type: cloudtrail
+      events:
+        - RunInstances
+  description: |
+    Find all (non-ASG) instances that are not conformant
+    to tagging policies, and tag them for stoppage in 1 days.
+  comments: |
+    Your EC2 instance does not have all the required tags on it and will be stopped tomorrow between 00:00-1:00 UTC if all the required tags have not been added.  If tags are not made compliant after 3 days your instance will be terminated.
+  filters:
+    - "tag:aws:autoscaling:groupName": absent
+    - "tag:c7n_tag_compliance": absent
+    - or: *tag-compliance-filters
+  actions:
+    - type: mark-for-op
+      tag: c7n_tag_compliance
+      op: stop
+      days: 1
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "EC2 - Missing Required Tags - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Your sever is missing the required tags and is being marked for stopping if tags not added:"
+      action_desc: "Actions Taken:  The EC2 instance is marked to be stopped tomorrow if required tags don't get added to the instance"
+      to:
+        - CloudCustodian@Company.com
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/1234567890/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+
+- name: ec2-tag-compliance-unmark
+  resource: ec2
+  mode:
+      type: periodic
+      schedule: "rate(5 minutes)"
+  description: |
+    Any instances which have previously been marked as
+    non compliant with tag policies, that are now compliant
+    should be unmarked as non-compliant.
+  comments: |
+    Thank you for adding the required tags to your EC2 instance!  It is now compliant and has been started if it was in a stopped state.
+  filters:
+    - "tag:aws:autoscaling:groupName": absent
+    - "tag:c7n_tag_compliance": not-null
+    - "tag:Resource Contact": not-null
+    - "tag:Billing Cost Center": not-null
+    - "tag:Environment": not-null
+    - "tag:Resource Purpose": not-null
+    - "tag:Business Unit": not-null
+  actions:
+    - type: unmark
+      tags: ["c7n_tag_compliance"]
+    - start
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "EC2 - Server is now compliant - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Your sever which was previously missing required tags is now compliant and won't be stopped:"
+      action_desc: "Actions Taken:  The instance has been unmarked for stopping as its now compliant with tags"
+      to:
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/1234567890/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: ec2-tag-compliance-stop
+  resource: ec2
+  mode:
+      type: periodic
+      schedule: "rate(1 hour)"
+  description: |
+    Stop all non autoscaling group instances previously marked
+    for stoppage by today's date, and schedule termination in
+    2 days. Also verify that they continue to not meet tagging
+    policies.
+  comments: |
+    Your EC2 instance has been stopped as it does not have all the required tags on it.  Please login to AWS and add the required tags to your instance.  Starting tomorrow hourly emails and shutdowns will start occuring if the instance is still not compliant. The following day your instance will be terminated.
+  filters:
+    - "tag:aws:autoscaling:groupName": absent
+    - or: *tag-compliance-filters
+    - type: marked-for-op
+      tag: c7n_tag_compliance
+      op: stop
+    - type: instance-age
+      op: greater-than
+      hours: 24
+    - not:
+        - "State.Name": terminated
+  actions:
+    - stop
+    - type: mark-for-op
+      tag: c7n_tag_compliance
+      op: terminate
+      days: 2
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "EC2 - !!!! Missing Required Tags !!!! - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Your sever is missing the required tags and will be terminated in 2 days if still not compliant.  Until then the server will be stopped every hour until tagged:"
+      action_desc: "Actions Taken:  The EC2 instance has been stopped as it doesn't meet tagging requirements.  Please tag your instance.  Instance will be terminated in 2 days if not tagged."
+      to:
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/1234567890/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: ec2-tag-compliance-terminate
+  resource: ec2
+  mode:
+      type: periodic
+      schedule: "rate(1 hour)"
+  description: |
+    Terminate all stopped instances marked for termination
+    by today's date.
+  comments: |
+    Your EC2 instance has been terminated as it still did not meet the required tag compliance!
+  filters:
+    - "tag:aws:autoscaling:groupName": absent
+    - or: *tag-compliance-filters
+    - type: marked-for-op
+      tag: c7n_tag_compliance
+      op: terminate
+    - type: instance-age
+      op: greater-than
+      hours: 72
+    - not:
+        - "State.Name": terminated
+  actions:
+    - type: terminate
+      force: true
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "EC2 - Server Terminated Due To Missing Tags - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Your sever is still missing the  required tags :"
+      action_desc: "Actions Taken:  The EC2 instance has been Terminated.  A new instance will need to be launched to replace this if needed.  Please make sure to tag the new instance"
+      to:
+        - CloudCustodian@Company.com
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/1234567890/cloud-custodian-mailer
+        region: us-east-1
+
+
+- name: ec2-tag-compliance-nag-stop
+  resource: ec2
+  mode:
+      type: periodic
+      schedule: "rate(1 hour)"
+  description: |
+    Stop all instances marked for termination every hour
+    starting 1 day before their termination.
+  comments: |
+    Your EC2 instance does not have all the required tags on it and will be stopped hourly today.  Tomorrow it will be terminated if still not compliant on tags.
+  filters:
+    - "tag:aws:autoscaling:groupName": absent
+    - or: *tag-compliance-filters
+    - type: marked-for-op
+      tag: c7n_tag_compliance
+      op: terminate
+      skew: 1
+    - type: instance-age
+      op: greater-than
+      hours: 48
+    - not:
+        - "State.Name": terminated
+  actions:
+    - stop
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "EC2 - Server Stopped!!! - [custodian {{ account }} - {{ region }}]" 
+      violation_desc: "Your sever is missing the required tags and will be terminated in less than 1 day if still not compliant.  Until then the server will be stopped every hour until tagged or terminated:"
+      action_desc: "Actions Taken:  The EC2 instance has been stopped as it doesn't meet tagging requirements.  Please tag your instance.  Instance will be terminated in less than 1 day if not tagged."
+      to:
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/1234567890/cloud-custodian-mailer
+        region: us-east-1
