@@ -1,0 +1,40 @@
+debug: True
+queue_url: https://sqs.us-east-1.amazonaws.com/XXXXXXXXXXX/agt-cloud-custodian-mailer
+
+from_address: CloudCustodian@Company.com
+
+contact_tags:
+  - "Resource Contact"
+
+region: us-east-1
+role: arn:aws:iam::XXXXXXXXXXX:role/Cloud_Custodian_Role
+timeout: 300
+subnets:
+  - subnet-XXXXXXXX # for ldap lookups
+  - subnet-XXXXXXXX  # for ldap looups
+  - subnet-XXXXXXXXX  # for ldap looups
+security_groups:
+  - sg-XXXXXXXX
+  - sg-XXXXXXXX
+
+ses_region: us-east-1
+
+cache_engine: redis
+redis_host: 'c7n-redis-address.0001.use1.cache.amazonaws.com'
+redis_port: 6379
+
+http_proxy: http://proxy.somewhere.com:9090
+https_proxy: http://proxy.somewhere.com:9090
+
+
+ldap_uri: "ldap://somewhere.com:389"
+ldap_bind_dn: "DC=Some,DC=Global"
+ldap_bind_user: SOMEUSERS
+ldap_bind_password: XXXXXXXXXXX
+ldap_bind_password_in_kms: False
+ldap_uid_attribute: sAMAccountName
+ldap_email_key: mail
+ldap_manager_attribute: manager
+
+ldap_uid_tags:
+  - CreatorName
