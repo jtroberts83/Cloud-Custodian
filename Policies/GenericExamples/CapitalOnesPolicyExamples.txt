@@ -1,6 +1,44 @@
-﻿
 
- 1 ##"""Action to put metrics based on an expression into CloudWatch metrics
+
+ 1 ##"""Tag a resource with the user who created/modified it.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: ec2-auto-tag-ownercontact
+          resource: ec2
+          description: |
+            Triggered when a new EC2 Instance is launched. Checks to see if
+            it's missing the OwnerContact tag. If missing it gets created
+            with the value of the ID of whomever called the RunInstances API
+          mode:
+            type: cloudtrail
+            role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+            events:
+              - RunInstances
+          filters:
+           - tag:OwnerContact: absent
+          actions:
+           - type: auto-tag-user
+             tag: OwnerContact
+
+    There's a number of caveats to usage. Resources which don't
+    include tagging as part of their api may have some delay before
+    automation kicks in to create a tag. Real world delay may be several
+    minutes, with worst case into hours[0]. This creates a race condition
+    between auto tagging and automation.
+
+    In practice this window is on the order of a fraction of a second, as
+    we fetch the resource and evaluate the presence of the tag before
+    attempting to tag it.
+
+    References
+     - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
+     - CloudTrail User - http://goo.gl/XQhIG6
+    """ 
+
+
+ 2 ##"""Action to put metrics based on an expression into CloudWatch metrics
 
     :example:
 
@@ -25,7 +63,346 @@
     """ 
 
 
- 2 ##"""Verify cloud trail enabled for this account per specifications.
+ 3 ##"""Automatically remove tags from an ec2 resource.
+
+    EC2 Resources have a limit of 10 tags, in order to make
+    additional tags space on a set of resources, this action can
+    be used to remove enough tags to make the desired amount of
+    space while preserving a given set of tags.
+
+    .. code-block :: yaml
+
+      - policies:
+         - name: ec2-tag-trim
+           comment: |
+             Any instances with 8 or more tags get tags removed until
+             they match the target tag count, in this case 7 so we
+             that we free up a tag slot for another usage.
+           resource: ec2
+           filters:
+               # Filter down to resources which already have 8 tags
+               # as we need space for 3 more, this also ensures that
+               # metrics reporting is correct for the policy.
+               type: value
+               key: "[length(Tags)][0]"
+               op: ge
+               value: 8
+           actions:
+             - type: tag-trim
+               space: 3
+               preserve:
+                - OwnerContact
+                - ASV
+                - CMDBEnvironment
+                - downtime
+                - custodian_status
+    """ 
+
+
+ 4 ##"""Filter resources for tag specified future action
+
+    Filters resources by a 'custodian_status' tag which specifies a future
+    date for an action.
+
+    The filter parses the tag values looking for an 'op@date'
+    string. The date is parsed and compared to do today's date, the
+    filter succeeds if today's date is gte to the target date.
+
+    The optional 'skew' parameter provides for incrementing today's
+    date a number of days into the future. An example use case might
+    be sending a final notice email a few days before terminating an
+    instance, or snapshotting a volume prior to deletion.
+
+    .. code-block :: yaml
+
+      - policies:
+        - name: ec2-stop-marked
+          resource: ec2
+          filters:
+            - type: marked-for-op
+              # The default tag used is custodian_status
+              # but that is configurable
+              tag: custodian_status
+              op: stop
+              # Another optional tag is skew
+          actions:
+            - stop
+
+    """ 
+
+
+ 5 ##"""Tag resources for future action.
+
+    .. code-block :: yaml
+
+      - policies:
+        - name: ec2-stop-marked
+          resource: ec2
+          filters:
+            - type: marked-for-op
+              # The default tag used is custodian_status
+              # but that is configurable
+              tag: custodian_status
+              op: stop
+              # Another optional tag is skew
+          actions:
+            - stop
+    """ 
+
+
+ 6 ##"""Transform the value of a tag.
+
+    Set the tag value to uppercase, title, lowercase, or strip text
+    from a tag key.
+
+    .. code-block :: yaml
+
+        policies:
+          - name: ec2-service-transform-lower
+            resource: ec2
+            comment: |
+              ec2-service-tag-value-to-lower
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:testing8882": present
+            actions:
+              - type: normalize-tag
+                key: lower_key
+                action: lower
+
+          - name: ec2-service-strip
+            resource: ec2
+            comment: |
+              ec2-service-tag-strip-blah
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:testing8882": present
+            actions:
+              - type: normalize-tag
+                key: strip_key
+                action: strip
+                value: blah
+
+    """ 
+
+
+ 7 ##"""Tag resources for future action.
+
+    :example:
+
+        .. code-block :: yaml
+
+            policies:
+            - name: ec2-mark-stop
+              resource: ec2
+              filters:
+                - type: image-age
+                  op: ge
+                  days: 90
+              actions:
+                - type: mark-for-op
+                  tag: custodian_cleanup
+                  op: terminate
+                  days: 4
+    """ 
+
+
+ 8 ##"""
+Resource Scheduling Offhours
+============================
+
+Custodian provides for time based filters, that allow for taking periodic
+action on a resource, with resource schedule customization based on tag values.
+A common use is offhours scheduling for asgs and instances.
+
+Features
+========
+
+- Flexible offhours scheduling with opt-in, opt-out selection, and timezone
+  support.
+- Resume during offhours support.
+- Can be combined with other filters to get a particular set (
+  resources with tag, vpc, etc).
+- Can be combined with arbitrary actions
+
+Policy Configuration
+====================
+
+We provide an `onhour` and `offhour` time filter, each should be used in a
+different policy, they support the same configuration options:
+
+ - **weekends**: default true, whether to leave resources off for the weekend
+ - **weekend-only**: default false, whether to turn the resource off only on
+   the weekend
+ - **default_tz**: which timezone to utilize when evaluating time **(REQUIRED)**
+ - **tag**: which resource tag name to use for per-resource configuration
+   (schedule and timezone overrides and opt-in/opt-out); default is
+   ``maid_offhours``.
+ - **opt-out**: Determines the behavior for resources which do not have a tag
+   matching the one specified for **tag**. Values can be either ``false`` (the
+   default) where the policy operates on an opt-in basis and resources must have
+   the tag in order to be acted on by the policy, or ``true`` where the policy
+   operates on an opt-out basis, and resources without the tag are acted on by
+   the policy.
+ - **onhour**: the default time to start/run resources, specified as 0-23
+ - **offhour**: the default time to stop/suspend resources, specified as 0-23
+
+This example policy overrides most of the defaults for an offhour policy:
+
+.. code-block:: yaml
+
+   policies:
+     - name: offhours-stop
+       resource: ec2
+       filters:
+         - type: offhour
+           weekends: false
+           default_tz: pt
+           tag: downtime
+           opt-out: true
+           onhour: 8
+           offhour: 20
+
+Tag Based Configuration
+=======================
+
+Resources can use a special tag to override the default configuration on a
+per-resource basis. Note that the name of the tag is configurable via the
+``tag`` option in the policy; the examples below use the default tag name,
+``maid_offhours``.
+
+The value of the tag must be one of the following:
+
+- **(empty)** or **on** - An empty tag value or a value of "on" implies night
+  and weekend offhours using the default time zone configured in the policy
+  (tz=est if unspecified) and the default onhour and offhour values configured
+  in the policy.
+- **off** - If offhours is configured to run in opt-out mode, this tag can be
+  specified to disable offhours on a given instance. If offhours is configured
+  to run in opt-in mode, this tag will have no effect (the resource will still
+  be opted out).
+- a semicolon-separated string composed of one or more of the following
+  components, which override the defaults specified in the policy:
+
+  * ``tz=<timezone>`` to evaluate with a resource-specific timezone, where
+    ``<timezone>`` is either one of the supported timezone aliases defined in
+    :py:attr:`c7n.filters.offhours.Time.TZ_ALIASES` (such as ``pt``) or the name
+    of a geographic timezone identifier in
+    [IANA's tzinfo database](https://www.iana.org/time-zones), such as
+    ``Americas/Los_Angeles``. *(Note all timezone aliases are
+    referenced to a locality to ensure taking into account local daylight
+    savings time, if applicable.)*
+  * ``off=(time spec)`` and/or ``on=(time spec)`` matching time specifications
+    supported by :py:class:`c7n.filters.offhours.ScheduleParser` as described
+    in the next section.
+
+ScheduleParser Time Specifications
+----------------------------------
+
+Each time specification follows the format ``(days,hours)``. Multiple time
+specifications can be combined in square-bracketed lists, i.e.
+``[(days,hours),(days,hours),(days,hours)]``.
+
+**Examples**::
+
+    # up mon-fri from 7am-7pm; eastern time
+    off=(M-F,19);on=(M-F,7)
+    # up mon-fri from 6am-9pm; up sun from 10am-6pm; pacific time
+    off=[(M-F,21),(U,18)];on=[(M-F,6),(U,10)];tz=pt
+
+**Possible values**:
+
+    +------------+----------------------+
+    | field      | values               |
+    +============+======================+
+    | days       | M, T, W, H, F, S, U  |
+    +------------+----------------------+
+    | hours      | 0, 1, 2, ..., 22, 23 |
+    +------------+----------------------+
+
+    Days can be specified in a range (ex. M-F).
+
+Policy examples
+===============
+
+Turn ec2 instances on and off
+
+.. code-block:: yaml
+
+   policies:
+     - name: offhours-stop
+       resource: ec2
+       filters:
+          - type: offhour
+       actions:
+         - stop
+
+     - name: offhours-start
+       resource: ec2
+       filters:
+         - type: onhour
+       actions:
+         - start
+
+Here's doing the same with auto scale groups
+
+.. code-block:: yaml
+
+    policies:
+      - name: asg-offhours-stop
+        resource: asg
+        filters:
+           - offhour
+        actions:
+           - suspend
+      - name: asg-onhours-start
+        resource: asg
+        filters:
+           - onhour
+        actions:
+           - resume
+
+Additional policy examples and resource-type-specific information can be seen in
+the :ref:`EC2 Offhours <ec2offhours>` and :ref:`ASG Offhours <asgoffhours>`
+use cases.
+
+Resume During Offhours
+======================
+
+These policies are evaluated hourly; during each run (once an hour),
+cloud-custodian will act on **only** the resources tagged for that **exact**
+hour. In other words, if a resource has an offhours policy of
+stopping/suspending at 23:00 Eastern daily and starting/resuming at 06:00
+Eastern daily, and you run cloud-custodian once an hour via Lambda, that
+resource will only be stopped once a day sometime between 23:00 and 23:59, and
+will only be started once a day sometime between 06:00 and 06:59. If the current
+hour does not *exactly* match the hour specified in the policy, nothing will be
+done at all.
+
+As a result of this, if custodian stops an instance or suspends an ASG and you
+need to start/resume it, you can safely do so manually and custodian won't touch
+it again until the next day.
+
+ElasticBeanstalk, EFS and Other Services with Tag Value Restrictions
+====================================================================
+
+A number of AWS services have restrictions on the characters that can be used
+in tag values, such as `ElasticBeanstalk <http://docs.aws.amazon.com/elasticbean
+stalk/latest/dg/using-features.tagging.html>`_ and `EFS <http://docs.aws.amazon.
+com/efs/latest/ug/API_Tag.html>`_. In particular, these services do not allow
+parenthesis, square brackets, commas, or semicolons, or empty tag values. This
+proves to be problematic with the tag-based schedule configuration described
+above. The best current workaround is to define a separate policy with a unique
+``tag`` name for each unique schedule that you want to use, and then tag
+resources with that tag name and a value of ``on``. Note that this can only be
+used in opt-in mode, not opt-out.
+
+""" 
+
+
+ 9 ##"""Verify cloud trail enabled for this account per specifications.
 
     Returns an annotated account resource if trail is not enabled.
 
@@ -48,7 +425,7 @@
     """ 
 
 
- 3 ##"""Is config service enabled for this account
+ 10 ##"""Is config service enabled for this account
 
     :example:
 
@@ -66,7 +443,7 @@
     """ 
 
 
- 4 ##"""Return annotated account resource if iam summary filter matches.
+ 11 ##"""Return annotated account resource if iam summary filter matches.
 
     Some use cases include, detecting root api keys or mfa usage.
 
@@ -124,7 +501,7 @@
     """ 
 
 
- 5 ##"""Check an account's password policy.
+ 12 ##"""Check an account's password policy.
 
     Note that on top of the default password policy fields, we also add an extra key,
     PasswordPolicyConfigured which will be set to true or false to signify if the given
@@ -149,7 +526,7 @@
     """ 
 
 
- 6 ##"""Check if account's service limits are past a given threshold.
+ 13 ##"""Check if account's service limits are past a given threshold.
 
     Supported limits are per trusted advisor, which is variable based
     on usage in the account and support level enabled on the account.
@@ -211,7 +588,49 @@
     """ 
 
 
- 7 ##"""Is the account configured with a virtual MFA device?
+ 14 ##"""File support ticket to raise limit.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: account-service-limits
+            resource: account
+            filters:
+              - type: service-limit
+                services:
+                  - EBS
+                limits:
+                  - Provisioned IOPS (SSD) storage (GiB)
+                threshold: 60.5
+            actions:
+              - type: request-limit-increase
+                notify: [email, email2]
+                ## You can use one of either percent-increase or an amount-increase.
+                percent-increase: 50
+                message: "Please raise the below account limit(s); \n {limits}"
+    """ 
+
+
+ 15 ##"""Enables logging on the trail(s) named in the policy
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: trail-test
+            description: Ensure CloudTrail logging is enabled
+            resource: account
+            actions:
+              - type: enable-cloudtrail
+                trail: mytrail
+                bucket: trails
+    """ 
+
+
+ 16 ##"""Is the account configured with a virtual MFA device?
 
     :example:
 
@@ -227,7 +646,7 @@
     """ 
 
 
- 8 ##"""Ensure all buckets in account are setup to log data events.
+ 17 ##"""Ensure all buckets in account are setup to log data events.
 
     Note this works via a single trail for data events per
     (https://goo.gl/1ux7RG).
@@ -251,7 +670,7 @@
     """ 
 
 
- 9 ##"""Action to deregister AMI
+ 18 ##"""Action to deregister AMI
 
     To prevent deregistering all AMI, it is advised to use in conjunction with
     a filter (such as image-age)
@@ -271,7 +690,7 @@
     """ 
 
 
- 10 ##"""Action to remove the ability to launch an instance from an AMI
+ 19 ##"""Action to remove the ability to launch an instance from an AMI
 
     This action will remove any launch permissions granted to other
     AWS accounts from the image, leaving only the owner capable of
@@ -293,7 +712,7 @@
     """ 
 
 
- 11 ##"""Filters images based on the age (in days)
+ 20 ##"""Filters images based on the age (in days)
 
     :example:
 
@@ -308,7 +727,7 @@
     """ 
 
 
- 12 ##"""Filters images based on usage
+ 21 ##"""Filters images based on usage
 
     true: image has no instances spawned from it
     false: image has instances spawned from it
@@ -326,7 +745,7 @@
     """ 
 
 
- 13 ##"""Action to enable/disable S3 logging for an application loadbalancer.
+ 22 ##"""Action to enable/disable S3 logging for an application loadbalancer.
 
     :example:
 
@@ -346,7 +765,7 @@
     """ 
 
 
- 14 ##"""Action to create a delayed action on an ELB to start at a later date
+ 23 ##"""Action to create a delayed action on an ELB to start at a later date
 
     :example:
 
@@ -367,7 +786,7 @@
     """ 
 
 
- 15 ##"""Action to create tag/tags on an ELB
+ 24 ##"""Action to create tag/tags on an ELB
 
     :example:
 
@@ -385,7 +804,7 @@
     """ 
 
 
- 16 ##"""Action to remove tag/tags from an ELB
+ 25 ##"""Action to remove tag/tags from an ELB
 
     :example:
 
@@ -402,7 +821,7 @@
     """ 
 
 
- 17 ##"""Action to delete an ELB
+ 26 ##"""Action to delete an ELB
 
     To avoid unwanted deletions of ELB, it is recommended to apply a filter
     to the rule
@@ -421,7 +840,7 @@
     """ 
 
 
- 18 ##""" Matches AppELBs that are logging to S3.
+ 27 ##""" Matches AppELBs that are logging to S3.
         bucket and prefix are optional
 
     :example:
@@ -444,7 +863,7 @@
     """ 
 
 
- 19 ##""" Matches AppELBs that are NOT logging to S3.
+ 28 ##""" Matches AppELBs that are NOT logging to S3.
         or do not match the optional bucket and/or prefix.
 
     :example:
@@ -467,7 +886,7 @@
     """ 
 
 
- 20 ##"""Filter ALB based on matching listener attributes
+ 29 ##"""Filter ALB based on matching listener attributes
 
     Adding the `matched` flag will filter on previously matched listeners
 
@@ -493,7 +912,7 @@
     """ 
 
 
- 21 ##"""Action to modify the policy for an App ELB
+ 30 ##"""Action to modify the policy for an App ELB
 
     :example:
 
@@ -515,7 +934,7 @@
     """ 
 
 
- 22 ##"""Filter AppELBs with mismatched health check protocols
+ 31 ##"""Filter AppELBs with mismatched health check protocols
 
     A mismatched health check protocol is where the protocol on the target group
     does not match the load balancer health check protocol
@@ -532,7 +951,7 @@
     """ 
 
 
- 23 ##"""Filter all ELB that exist within the default vpc
+ 32 ##"""Filter all ELB that exist within the default vpc
 
     :example:
 
@@ -546,7 +965,7 @@
     """ 
 
 
- 24 ##"""Action to create tag/tags on an ELB target group
+ 33 ##"""Action to create tag/tags on an ELB target group
 
     :example:
 
@@ -564,7 +983,7 @@
     """ 
 
 
- 25 ##"""Action to remove tag/tags from ELB target group
+ 34 ##"""Action to remove tag/tags from ELB target group
 
     :example:
 
@@ -581,7 +1000,7 @@
     """ 
 
 
- 26 ##"""Filter all application elb target groups within the default vpc
+ 35 ##"""Filter all application elb target groups within the default vpc
 
     :example:
 
@@ -595,7 +1014,26 @@
     """ 
 
 
- 27 ##"""Filter asg by launch config attributes.
+ 36 ##"""Action to delete ELB target group
+
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any app elb target groups.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroups-delete-unused
+                resource: app-elb-target-group
+                filters:
+                  - "tag:SomeTag": absent
+                actions:
+                  - delete
+    """ 
+
+
+ 37 ##"""Filter asg by launch config attributes.
 
     :example:
 
@@ -611,7 +1049,7 @@
     """ 
 
 
- 28 ##"""Check if an ASG is configured to have unencrypted volumes.
+ 38 ##"""Check if an ASG is configured to have unencrypted volumes.
 
     Checks both the ami snapshots and the launch configuration.
 
@@ -628,7 +1066,7 @@
     """ 
 
 
- 29 ##"""Filter asg by image age (in days).
+ 39 ##"""Filter asg by image age (in days).
 
     :example:
 
@@ -644,7 +1082,24 @@
     """ 
 
 
- 30 ##"""Filters ASG based on the VpcId
+ 40 ##"""Filter asg by image
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-image-tag
+                resource: asg
+                filters:
+                  - type: image
+                    value: "tag:ImageTag"
+                    key: "TagValue"
+                    op: eq
+    """ 
+
+
+ 41 ##"""Filters ASG based on the VpcId
 
     This filter is available as a ValueFilter as the vpc-id is not natively
     associated to the results from describing the autoscaling groups.
@@ -662,7 +1117,7 @@
     """ 
 
 
- 31 ##"""Action to trim the number of tags to avoid hitting tag limits
+ 42 ##"""Action to trim the number of tags to avoid hitting tag limits
 
     :example:
 
@@ -683,7 +1138,7 @@
     """ 
 
 
- 32 ##"""Filter returns ASG that have less instances than desired or required
+ 43 ##"""Filter returns ASG that have less instances than desired or required
 
     :example:
 
@@ -697,12 +1152,11 @@
     """ 
 
 
- 33 ##"""Action to resize the min/max instances in an ASG
+ 44 ##"""Action to resize the min/max/desired instances in an ASG
 
-    **Note:** Resizing of scaling groups desired/minimum size is limited to the
-    current size of the autoscaling group(s).
+    There are several ways to use this action:
 
-    :example:
+    1. set min/desired to current running instances
 
         .. code-block: yaml
 
@@ -713,11 +1167,45 @@
                   - capacity-delta
                 actions:
                   - type: resize
-                    desired_size: current
+                    desired-size: "current"
+
+    2. apply a fixed resize of min, max or desired, optionally saving the
+       previous values to a named tag (for restoring later):
+
+        .. code-block: yaml
+
+            policies:
+              - name: offhours-asg-off
+                resource: asg
+                filters:
+                  - type: offhour
+                    offhour: 19
+                    default_tz: bst
+                actions:
+                  - type: resize
+                    min-size: 0
+                    desired-size: 0
+                    save-options-tag: OffHoursPrevious
+
+    3. restore previous values for min/max/desired from a tag:
+
+        .. code-block: yaml
+
+            policies:
+              - name: offhours-asg-on
+                resource: asg
+                filters:
+                  - type: onhour
+                    onhour: 8
+                    default_tz: bst
+                actions:
+                  - type: resize
+                    restore-options-tag: OffHoursPrevious
+
     """ 
 
 
- 34 ##"""Action to remove tag/tags from an ASG
+ 45 ##"""Action to remove tag/tags from an ASG
 
     :example:
 
@@ -734,7 +1222,7 @@
     """ 
 
 
- 35 ##"""Action to add a tag to an ASG
+ 46 ##"""Action to add a tag to an ASG
 
     The *propagate* parameter can be used to specify that the tag being added
     will need to be propagated down to each ASG instance associated or simply
@@ -757,7 +1245,7 @@
     """ 
 
 
- 36 ##"""Propagate tags to an asg instances.
+ 47 ##"""Propagate tags to an asg instances.
 
     In AWS changing an asg tag does not propagate to instances.
 
@@ -781,7 +1269,7 @@
     """ 
 
 
- 37 ##"""Rename a tag on an AutoScaleGroup.
+ 48 ##"""Rename a tag on an AutoScaleGroup.
 
     :example:
 
@@ -800,7 +1288,7 @@
     """ 
 
 
- 38 ##"""Action to create a delayed action for a later date
+ 49 ##"""Action to create a delayed action for a later date
 
     :example:
 
@@ -822,7 +1310,7 @@
     """ 
 
 
- 39 ##"""Action to suspend ASG processes and instances
+ 50 ##"""Action to suspend ASG processes and instances
 
     AWS ASG suspend/resume and process docs https://goo.gl/XYtKQ8
 
@@ -840,7 +1328,7 @@
     """ 
 
 
- 40 ##"""Resume a suspended autoscale group and its instances
+ 51 ##"""Resume a suspended autoscale group and its instances
 
     Parameter 'delay' is the amount of time (in seconds) to wait between
     resuming each instance within the ASG (default value: 30)
@@ -860,7 +1348,7 @@
     """ 
 
 
- 41 ##"""Action to delete an ASG
+ 52 ##"""Action to delete an ASG
 
     The 'force' parameter is needed when deleting an ASG that has instances
     attached to it.
@@ -881,7 +1369,7 @@
     """ 
 
 
- 42 ##"""Filter ASG launch configuration by age (in days)
+ 53 ##"""Filter ASG launch configuration by age (in days)
 
     :example:
 
@@ -897,7 +1385,7 @@
     """ 
 
 
- 43 ##"""Filters all launch configurations that are not in use but exist
+ 54 ##"""Filters all launch configurations that are not in use but exist
 
     :example:
 
@@ -911,7 +1399,7 @@
     """ 
 
 
- 44 ##"""Filters all unused launch configurations
+ 55 ##"""Filters all unused launch configurations
 
     :example:
 
@@ -927,7 +1415,7 @@
     """ 
 
 
- 45 ##"""Filters lambda functions with cross-account permissions
+ 56 ##"""Filters lambda functions with cross-account permissions
 
     The whitelist parameter can be used to prevent certain accounts
     from being included in the results (essentially stating that these
@@ -950,7 +1438,7 @@
     """ 
 
 
- 46 ##"""Action to remove policy/permission statements from lambda functions.
+ 57 ##"""Action to remove policy/permission statements from lambda functions.
 
     :example:
 
@@ -967,7 +1455,7 @@
     """ 
 
 
- 47 ##"""Action to specify an action to occur at a later date
+ 58 ##"""Action to specify an action to occur at a later date
 
     :example:
 
@@ -987,7 +1475,7 @@
     """ 
 
 
- 48 ##"""Action to add tag(s) to Lambda Function(s)
+ 59 ##"""Action to add tag(s) to Lambda Function(s)
 
     :example:
 
@@ -1005,7 +1493,7 @@
     """ 
 
 
- 49 ##"""Action to remove tag(s) from Lambda Function(s)
+ 60 ##"""Action to remove tag(s) from Lambda Function(s)
 
     :example:
 
@@ -1022,7 +1510,7 @@
     """ 
 
 
- 50 ##"""Delete a lambda function (including aliases and older versions).
+ 61 ##"""Delete a lambda function (including aliases and older versions).
 
     :example:
 
@@ -1038,7 +1526,7 @@
     """ 
 
 
- 51 ##"""Action to delete cloudformation stacks
+ 62 ##"""Action to delete cloudformation stacks
 
     It is recommended to use a filter to avoid unwanted deletion of stacks
 
@@ -1056,7 +1544,7 @@
     """ 
 
 
- 52 ##"""Filter cloudfront distributions based on metric values
+ 63 ##"""Filter cloudfront distributions based on metric values
 
     :example:
 
@@ -1073,7 +1561,7 @@
     """ 
 
 
- 53 ##"""Action to disable a Distribution
+ 64 ##"""Action to disable a Distribution
 
     :example:
 
@@ -1092,7 +1580,7 @@
     """ 
 
 
- 54 ##"""Action to disable a Streaming Distribution
+ 65 ##"""Action to disable a Streaming Distribution
 
     :example:
 
@@ -1110,7 +1598,7 @@
     """ 
 
 
- 55 ##"""Action to set mandatory https-only on a Distribution
+ 66 ##"""Action to set mandatory https-only on a Distribution
 
     :example:
 
@@ -1130,7 +1618,71 @@
     """ 
 
 
- 56 ##"""Delete a cloudwatch alarm.
+ 67 ##"""Action to delete code commit
+
+    It is recommended to use a filter to avoid unwanted deletion of repos
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: codecommit-delete
+                resource: codecommit
+                actions:
+                  - delete
+    """ 
+
+
+ 68 ##"""Action to delete code build
+
+    It is recommended to use a filter to avoid unwanted deletion of builds
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: codebuild-delete
+                resource: codebuild
+                actions:
+                  - delete
+    """ 
+
+
+ 69 ##"""Action to delete cognito identity pool
+
+    It is recommended to use a filter to avoid unwanted deletion of pools
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: identity-pool-delete
+                resource: identity-pool
+                actions:
+                  - delete
+    """ 
+
+
+ 70 ##"""Action to delete cognito user pool
+
+    It is recommended to use a filter to avoid unwanted deletion of pools
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: user-pool-delete
+                resource: user-pool
+                actions:
+                  - delete
+    """ 
+
+
+ 71 ##"""Delete a cloudwatch alarm.
 
     :example:
 
@@ -1151,7 +1703,7 @@
     """ 
 
 
- 57 ##"""Action to set the retention period (in days) for CloudWatch log groups
+ 72 ##"""Action to set the retention period (in days) for CloudWatch log groups
 
     :example:
 
@@ -1166,7 +1718,7 @@
     """ 
 
 
- 58 ##"""
+ 73 ##"""
 
     :example:
 
@@ -1183,7 +1735,7 @@
     """ 
 
 
- 59 ##"""Filters CloudWatch log groups by last write
+ 74 ##"""Filters CloudWatch log groups by last write
 
     :example:
 
@@ -1198,7 +1750,23 @@
     """ 
 
 
- 60 ##"""Action to specify an action to occur at a later date
+ 75 ##"""Action to delete DataPipeline
+
+    It is recommended to use a filter to avoid unwanted deletion of DataPipeline
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: datapipeline-delete
+                resource: datapipeline
+                actions:
+                  - delete
+    """ 
+
+
+ 76 ##"""Action to specify an action to occur at a later date
 
     :example:
 
@@ -1219,7 +1787,7 @@
     """ 
 
 
- 61 ##"""Action to create tag(s) on a resource
+ 77 ##"""Action to create tag(s) on a resource
 
     :example:
 
@@ -1237,7 +1805,7 @@
     """ 
 
 
- 62 ##"""Action to remove tag(s) on a resource
+ 78 ##"""Action to remove tag(s) on a resource
 
     :example:
 
@@ -1254,7 +1822,7 @@
     """ 
 
 
- 63 ##"""Action to delete dynamodb tables
+ 79 ##"""Action to delete dynamodb tables
 
     :example:
 
@@ -1270,7 +1838,7 @@
     """ 
 
 
- 64 ##"""EBS Snapshot Age Filter
+ 80 ##"""EBS Snapshot Age Filter
 
     Filters an EBS snapshot based on the age of the snapshot (in days)
 
@@ -1288,7 +1856,7 @@
     """ 
 
 
- 65 ##"""
+ 81 ##"""
     Filter to remove snapshots of AMIs from results
 
     This filter is 'true' by default.
@@ -1324,7 +1892,7 @@
     """ 
 
 
- 66 ##"""Deletes EBS snapshots
+ 82 ##"""Deletes EBS snapshots
 
     :example:
 
@@ -1342,7 +1910,7 @@
     """ 
 
 
- 67 ##"""Copy a snapshot across regions
+ 83 ##"""Copy a snapshot across regions
 
     http://goo.gl/CP3dq
 
@@ -1365,7 +1933,7 @@
     """ 
 
 
- 68 ##"""Filter volumes based on filtering on their attached instance
+ 84 ##"""Filter volumes based on filtering on their attached instance
 
     :example:
 
@@ -1379,7 +1947,7 @@
     """ 
 
 
- 69 ##"""Copy instance tags to its attached volume.
+ 85 ##"""Copy instance tags to its attached volume.
 
     Useful for cost allocation to ebs volumes and tracking usage
     info for volumes.
@@ -1408,7 +1976,47 @@
     """ 
 
 
- 70 ##"""Snapshot an EBS volume
+ 86 ##"""Encrypt extant volumes attached to an instance
+
+    - Requires instance restart
+    - Not suitable for autoscale groups.
+
+    Multistep process:
+
+    - Stop instance (if running)
+    - For each volume
+       - Create snapshot
+       - Wait on snapshot creation
+       - Copy Snapshot to create encrypted snapshot
+       - Wait on snapshot creation
+       - Create encrypted volume from snapshot
+       - Wait on volume creation
+       - Delete transient snapshots
+       - Detach Unencrypted Volume
+       - Attach Encrypted Volume
+       - Set DeleteOnTermination instance attribute equal to source volume
+    - For each volume
+       - Delete unencrypted volume
+    - Start Instance (if originally running)
+    - For each newly encrypted volume
+       - Delete transient tags
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: encrypt-unencrypted-ebs
+                resource: ebs
+                filters:
+                  - Encrypted: false
+                actions:
+                  - type: encrypt-instance-volumes
+                    key: alias/encrypted
+    """ 
+
+
+ 87 ##"""Snapshot an EBS volume
 
     :example:
 
@@ -1425,7 +2033,7 @@
     """ 
 
 
- 71 ##"""Delete an ebs volume.
+ 88 ##"""Delete an ebs volume.
 
     If the force boolean is true, we will detach an attached volume
     from an instance. Note this cannot be done for running instance
@@ -1446,7 +2054,7 @@
     """ 
 
 
- 72 ##"""Modify an ebs volume online.
+ 89 ##"""Modify an ebs volume online.
 
     **Note this action requires use of modifyable filter**
 
@@ -1514,7 +2122,291 @@
     """ 
 
 
- 73 ##"""Filters all EC2 Container Registries (ECR) with cross-account access
+ 90 ##"""Age an instance has been in the given state.
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-state-running-7-days
+            resource: ec2
+            filters:
+              - type: state-age
+                op: ge
+                days: 7
+    """ 
+
+
+ 91 ##"""EC2 instances with EBS backed volume
+
+    Filters EC2 instances with EBS backed storage devices (non ephemeral)
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-encrypted-ebs-volumes
+            resource: ec2
+            filters:
+              - type: ebs
+                key: encrypted
+                value: true
+    """ 
+
+
+ 92 ##"""EC2 AMI age filter
+
+    Filters EC2 instances based on the age of their AMI image (in days)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-ancient-ami
+            resource: ec2
+            filters:
+              - type: image-age
+                op: ge
+                days: 90
+    """ 
+
+
+ 93 ##"""Custodian OffHour filter
+
+    Filters running EC2 instances with the intent to stop at a given hour of
+    the day.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: onhour-evening-stop
+            resource: ec2
+            filters:
+              - type: offhour
+                tag: custodian_downtime
+                default_tz: et
+                offhour: 20
+            actions:
+              - stop
+    """ 
+
+
+ 94 ##"""Custodian OnHour filter
+
+    Filters stopped EC2 instances with the intent to start at a given hour of
+    the day.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: onhour-morning-start
+            resource: ec2
+            filters:
+              - type: onhour
+                tag: custodian_downtime
+                default_tz: et
+                onhour: 6
+            actions:
+              - start
+    """ 
+
+
+ 95 ##"""EC2 instances with ephemeral storage
+
+    Filters EC2 instances that have ephemeral storage (an instance-store backed
+    root device)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-ephemeral-instances
+            resource: ec2
+            filters:
+              - type: ephemeral
+
+    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html
+    """ 
+
+
+ 96 ##"""Filters instances based on their age (in days)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-30-days-plus
+            resource: ec2
+            filters:
+              - type: instance-age
+                op: ge
+                days: 30
+    """ 
+
+
+ 97 ##"""EC2 instances without autoscaling or a recover alarm
+
+    Filters EC2 instances that are not members of an autoscaling group
+    and do not have Cloudwatch recover alarms.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - singleton
+            actions:
+              - type: tag
+                key: problem
+                value: instance is not resilient
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """ 
+
+
+ 98 ##"""Starts a previously stopped EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-start-stopped-instances
+            resource: ec2
+            query:
+              - instance-state-name: stopped
+            actions:
+              - start
+
+    http://docs.aws.amazon.com/cli/latest/reference/ec2/start-instances.html
+    """ 
+
+
+ 99 ##"""Stops a running EC2 instances
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-stop-running-instances
+            resource: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - stop
+    """ 
+
+
+ 100 ##"""reboots a previously running EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-reboot-instances
+            resource: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - reboot
+
+    http://docs.aws.amazon.com/cli/latest/reference/ec2/reboot-instances.html
+    """ 
+
+
+ 101 ##""" Terminate a set of instances.
+
+    While ec2 offers a bulk delete api, any given instance can be configured
+    with api deletion termination protection, so we can't use the bulk call
+    reliabily, we need to process the instances individually. Additionally
+    If we're configured with 'force' then we'll turn off instance termination
+    protection.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-process-termination
+            resource: ec2
+            filters:
+              - type: marked-for-op
+                op: terminate
+            actions:
+              - terminate
+    """ 
+
+
+ 102 ##"""Snapshots volumes attached to an EC2 instance
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-snapshots
+            resource: ec2
+          actions:
+            - type: snapshot
+              copy-tags:
+                - Name
+    """ 
+
+
+ 103 ##"""Adds a cloudwatch metric alarm to recover an EC2 instance.
+
+    This action takes effect on instances that are NOT part
+    of an ASG.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-autorecover-alarm
+            resource: ec2
+            filters:
+              - singleton
+          actions:
+            - autorecover-alarm
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """ 
+
+
+ 104 ##"""Sets (or removes) the instance profile for a running EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: set-default-instance-profile
+            resource: ec2
+            filters:
+              - IamInstanceProfile: absent
+            actions:
+              - type: set-instance-profile
+                name: default
+
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/disassociate-iam-instance-profile.html
+    """ 
+
+
+ 105 ##"""Filters all EC2 Container Registries (ECR) with cross-account access
 
     :example:
 
@@ -1531,7 +2423,7 @@
     """ 
 
 
- 74 ##"""Action to remove policy statements from ECR
+ 106 ##"""Action to remove policy statements from ECR
 
     :example:
 
@@ -1548,7 +2440,7 @@
     """ 
 
 
- 75 ##"""Filters elasticache clusters based on their associated subnet
+ 107 ##"""Filters elasticache clusters based on their associated subnet
 
     :example:
 
@@ -1564,7 +2456,7 @@
     """ 
 
 
- 76 ##"""Action to delete an elasticache cluster
+ 108 ##"""Action to delete an elasticache cluster
 
     To prevent unwanted deletion of elasticache clusters, it is recommended
     to include a filter
@@ -1588,7 +2480,7 @@
     """ 
 
 
- 77 ##"""Action to snapshot an elasticache cluster
+ 109 ##"""Action to snapshot an elasticache cluster
 
     :example:
 
@@ -1607,7 +2499,7 @@
     """ 
 
 
- 78 ##"""Filters elasticache snapshots based on their age (in days)
+ 110 ##"""Filters elasticache snapshots based on their age (in days)
 
     :example:
 
@@ -1623,7 +2515,7 @@
     """ 
 
 
- 79 ##"""Action to delete elasticache snapshots
+ 111 ##"""Action to delete elasticache snapshots
 
     To prevent unwanted deletion of elasticache snapshots, it is recommended to
     apply a filter
@@ -1644,29 +2536,7 @@
     """ 
 
 
- 80 ##"""
-    Copy specified tags from Elasticache cluster to Snapshot
-    :example:
-
-        .. code-block: yaml
-
-            - name: elasticache-test
-              resource: cache-snapshot
-              filters:
-                 - type: value
-                   key: SnapshotName
-                   op: in
-                   value:
-                    - test-tags-backup
-              actions:
-                - type: copy-cluster-tags
-                  tags:
-                    - tag1
-                    - tag2
-    """ 
-
-
- 81 ##"""Action to specify an action to occur at a later date
+ 112 ##"""Action to specify an action to occur at a later date
 
     :example:
 
@@ -1687,7 +2557,7 @@
     """ 
 
 
- 82 ##"""Action to add tag(s) to ELB(s)
+ 113 ##"""Action to add tag(s) to ELB(s)
 
     :example:
 
@@ -1705,7 +2575,7 @@
     """ 
 
 
- 83 ##"""Action to remove tag(s) from ELB(s)
+ 114 ##"""Action to remove tag(s) from ELB(s)
 
     :example:
 
@@ -1722,7 +2592,7 @@
     """ 
 
 
- 84 ##"""Action to delete ELB(s)
+ 115 ##"""Action to delete ELB(s)
 
     It is recommended to apply a filter to the delete policy to avoid unwanted
     deletion of any load balancers.
@@ -1741,7 +2611,7 @@
     """ 
 
 
- 85 ##"""Action to set the ELB SSL listener policy
+ 116 ##"""Action to set the ELB SSL listener policy
 
     :example:
 
@@ -1760,7 +2630,7 @@
     """ 
 
 
- 86 ##"""Action to enable S3 logging for Elastic Load Balancers.
+ 117 ##"""Action to enable S3 logging for Elastic Load Balancers.
 
     :example:
 
@@ -1779,7 +2649,7 @@
     """ 
 
 
- 87 ##"""Disable s3 logging for ElasticLoadBalancers.
+ 118 ##"""Disable s3 logging for ElasticLoadBalancers.
 
     :example:
 
@@ -1796,7 +2666,7 @@
     """ 
 
 
- 88 ##"""Filter ELB by an associated instance value(s)
+ 119 ##"""Filter ELB by an associated instance value(s)
 
     :example:
 
@@ -1812,7 +2682,7 @@
     """ 
 
 
- 89 ##"""Filters ELB that are using a SSL policy
+ 120 ##"""Filters ELB that are using a SSL policy
 
     :example:
 
@@ -1826,7 +2696,7 @@
     """ 
 
 
- 90 ##"""Filter ELBs on the properties of SSLNegotation policies.
+ 121 ##"""Filter ELBs on the properties of SSLNegotation policies.
     TODO: Only works on custom policies at the moment.
 
     whitelist: filter all policies containing permitted protocols
@@ -1862,7 +2732,7 @@
     """ 
 
 
- 91 ##"""Filters ELB that have a healtch check protocol mismatch
+ 122 ##"""Filters ELB that have a healtch check protocol mismatch
 
     The mismatch occurs if the ELB has a different protocol to check than
     the associated instances allow to determine health status.
@@ -1879,7 +2749,7 @@
     """ 
 
 
- 92 ##""" Matches if an elb database is in the default vpc
+ 123 ##""" Matches if an elb database is in the default vpc
 
     :example:
 
@@ -1893,7 +2763,7 @@
     """ 
 
 
- 93 ##"""Matches ELBs that are logging to S3.
+ 124 ##"""Matches ELBs that are logging to S3.
         bucket and prefix are optional
 
     :example:
@@ -1915,7 +2785,7 @@
     """ 
 
 
- 94 ##""" Matches ELBs that are NOT logging to S3.
+ 125 ##""" Matches ELBs that are NOT logging to S3.
         or do not match the optional bucket and/or prefix.
 
     :example:
@@ -1938,7 +2808,7 @@
     """ 
 
 
- 95 ##"""Action to specify an action to occur at a later date
+ 126 ##"""Action to specify an action to occur at a later date
 
     :example:
 
@@ -1958,7 +2828,7 @@
     """ 
 
 
- 96 ##"""Action to create tag(s) on a resource
+ 127 ##"""Action to create tag(s) on a resource
 
     :example:
 
@@ -1976,7 +2846,7 @@
     """ 
 
 
- 97 ##"""Action to remove tag(s) on a resource
+ 128 ##"""Action to remove tag(s) on a resource
 
     :example:
 
@@ -1993,7 +2863,7 @@
     """ 
 
 
- 98 ##"""Action to terminate EMR cluster(s)
+ 129 ##"""Action to terminate EMR cluster(s)
 
     It is recommended to apply a filter to the terminate action to avoid
     termination of all EMR clusters
@@ -2012,7 +2882,7 @@
     """ 
 
 
- 99 ##"""Action to remove policy statements from Glacier
+ 130 ##"""Action to remove policy statements from Glacier
 
     :example:
 
@@ -2029,118 +2899,7 @@
     """ 
 
 
- 100 ##"""Filter IAM roles that has a specific policy attached
-
-    For example, if the user wants to check all roles with 'admin-policy':
-
-    .. code-block: yaml
-
-     - name: iam-roles-have-admin
-       resource: iam-role
-       filters:
-        - type: has-specific-managed-policy
-          value: admin-policy
-
-    """ 
-
-
- 101 ##"""Filter IAM roles that do not have a specific policy attached
-
-    For example, if the user wants to check all roles without 'ip-restriction':
-
-    .. code-block: yaml
-
-     - name: iam-roles-no-ip-restriction
-       resource: iam-role
-       filters:
-        - type: no-specific-managed-policy
-          value: ip-restriction
-
-    """ 
-
-
- 102 ##"""Check if IAM policy resource(s) have allow-all IAM policy statement block.
-
-    This allows users to implement CIS AWS check 1.24 which states that no
-    policy must exist with the following requirements.
-
-    Policy must have 'Action' and Resource = '*' with 'Effect' = 'Allow'
-
-    The policy will trigger on the following IAM policy (statement).
-    For example:
-
-    .. code-block: json
-     {
-         'Version': '2012-10-17',
-         'Statement': [{
-             'Action': '*',
-             'Resource': '*',
-             'Effect': 'Allow'
-         }]
-     }
-
-    Additionally, the policy checks if the statement has no 'Condition' or
-    'NotAction'
-
-    For example, if the user wants to check all used policies and filter on
-    allow all:
-
-    .. code-block: yaml
-
-     - name: iam-no-used-all-all-policy
-       resource: iam-policy
-       filters:
-         - type: used
-         - type: has-allow-all
-
-    Note that scanning and getting all policies and all statements can take
-    a while. Use it sparingly or combine it with filters such as 'used' as
-    above.
-
-    """ 
-
-
- 103 ##"""Use IAM Credential report to filter users.
-
-    The IAM Credential report ( https://goo.gl/sbEPtM ) aggregates
-    multiple pieces of information on iam users. This makes it highly
-    efficient for querying multiple aspects of a user that would
-    otherwise require per user api calls.
-
-    For example if we wanted to retrieve all users with mfa who have
-    never used their password but have active access keys from the
-    last month
-
-    .. code-block: yaml
-
-     - name: iam-mfa-active-keys-no-login
-       resource: iam-user
-       filters:
-         - type: credential
-           key: mfa_active
-           value: true
-         - type: credential
-           key: password_last_used
-           value: absent
-         - type: credential
-           key: access_keys.last_used
-           value_type: age
-           value: 30
-           op: less-than
-
-    Credential Report Transforms
-
-    We perform some default transformations from the raw
-    credential report. Sub-objects (access_key_1, cert_2)
-    are turned into array of dictionaries for matching
-    purposes with their common prefixes stripped.
-    N/A values are turned into None, TRUE/FALSE are turned
-    into boolean values.
-
-    """ 
-
-
- 104 ##"""Filter IAM users based on attached policy values
+ 131 ##"""Filter IAM users based on attached policy values
 
     :example:
 
@@ -2156,7 +2915,7 @@
     """ 
 
 
- 105 ##"""Filter IAM users based on attached group values
+ 132 ##"""Filter IAM users based on attached group values
 
     :example:
 
@@ -2172,7 +2931,7 @@
     """ 
 
 
- 106 ##"""Filter IAM users based on access-key values
+ 133 ##"""Filter IAM users based on access-key values
 
     :example:
 
@@ -2188,82 +2947,7 @@
     """ 
 
 
- 107 ##"""Delete a user.
-
-    For example if you want to have a whitelist of valid (machine-)users
-    and want to ensure that no users have been clicked without documentation.
-
-    You can use both the 'credential' or the 'username'
-    filter. 'credential' will have an SLA of 4h,
-    (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html),
-    but the added benefit of performing less API calls, whereas
-    'username' will make more API calls, but have a SLA of your cache.
-
-    :example:
-
-      .. code-block: yaml
-
-        # using a 'credential' filter'
-        - name: iam-only-whitelisted-users
-          resource: iam-user
-          filters:
-            - type: credential
-              key: user
-              op: not-in
-              value:
-                - valid-user-1
-                - valid-user-2
-          actions:
-            - delete
-
-        # using a 'username' filter with 'UserName'
-        - name: iam-only-whitelisted-users
-          resource: iam-user
-          filters:
-            - type: username
-              key: UserName
-              op: not-in
-              value:
-                - valid-user-1
-                - valid-user-2
-          actions:
-            - delete
-
-         # using a 'username' filter with 'Arn'
-        - name: iam-only-whitelisted-users
-          resource: iam-user
-          filters:
-            - type: username
-              key: Arn
-              op: not-in
-              value:
-                - arn:aws:iam:123456789012:user/valid-user-1
-                - arn:aws:iam:123456789012:user/valid-user-2
-          actions:
-            - delete
-
-    """ 
-
-
- 108 ##"""Delete or disable user's access keys.
-
-    For example if we wanted to disable keys after 90 days of non-use and
-    delete them after 180 days of nonuse:
-
-    .. code-block: yaml
-
-     - name: iam-mfa-active-keys-no-login
-       resource: iam-user
-       actions:
-         - type: remove-keys
-           disable: true
-           age: 90
-         - type: remove-keys
-           age: 180
-    """ 
-
-
- 109 ##"""Filters KMS keys by the rotation status
+ 134 ##"""Filters KMS keys by the rotation status
 
     :example:
 
@@ -2279,7 +2963,7 @@
     """ 
 
 
- 110 ##"""Filter KMS keys which have cross account permissions
+ 135 ##"""Filter KMS keys which have cross account permissions
 
     :example:
 
@@ -2293,7 +2977,7 @@
     """ 
 
 
- 111 ##"""Filters KMS key grants
+ 136 ##"""Filters KMS key grants
 
     This can be used to ensure issues around grant limits are monitored
 
@@ -2310,7 +2994,7 @@
     """ 
 
 
- 112 ##"""Action to remove policy statements from KMS
+ 137 ##"""Action to remove policy statements from KMS
 
     :example:
 
@@ -2327,7 +3011,139 @@
     """ 
 
 
- 113 ##""" Matches if an rds database is in the default vpc
+ 138 ##"""Action to create tag(s) on KMS keys
+
+        :example:
+
+            .. code-block: yaml
+
+                policies:
+                  - name: tag-kms-keys
+                    resource: kms-key
+                    filters:
+                      - "tag:RequiredTag": absent
+                    actions:
+                      - type: tag
+                        key: RequiredTag
+                        value: tag-value
+        """ 
+
+
+ 139 ##"""Action to remove tag(s) on KMS keys
+
+        :example:
+
+            .. code-block: yaml
+
+                policies:
+                  - name: kms-key-remove-tag
+                    resource: kms-key
+                    filters:
+                      - "tag:ExpiredTag": present
+                    actions:
+                      - type: remove-tag
+                        tags: ["ExpiredTag"]
+        """ 
+
+
+ 140 ##"""Action to delete machine learning model
+
+    It is recommended to use a filter to avoid unwanted deletion of models
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: ml-model-delete
+                resource: ml-model
+                actions:
+                  - delete
+    """ 
+
+
+ 141 ##"""Action to delete Opswork Stack
+
+    It is recommended to use a filter to avoid unwanted deletion of stacks
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: opswork-delete
+                resource: opswork-stack
+                actions:
+                  - delete
+    """ 
+
+
+ 142 ##"""Action to stop Opswork Stack (Stops all instances under stack)
+
+    It is recommended to use a filter to avoid unwanted stopping of stacks
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: opswork-stop
+                resource: opswork-stack
+                actions:
+                  - stop
+    """ 
+
+
+ 143 ##"""Action to delete Opswork for Chef Automate server
+
+    It is recommended to use a filter to avoid unwanted deletion of servers
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: opsworks-cm-delete
+                resource: opswork-cm
+                actions:
+                  - delete
+    """ 
+
+
+ 144 ##"""
+RDS Resource Manager
+====================
+
+Example Policies
+----------------
+
+Find rds instances that are publicly available
+
+.. code-block:: yaml
+
+   policies:
+      - name: rds-public
+        resource: rds
+        filters:
+         - PubliclyAccessible: true
+
+Find rds instances that are not encrypted
+
+.. code-block:: yaml
+
+   policies:
+      - name: rds-non-encrypted
+        resource: rds
+        filters:
+         - type: value
+           key: StorageEncrypted
+           value: true
+           op: ne
+
+""" 
+
+
+ 145 ##""" Matches if an rds database is in the default vpc
 
     :example:
 
@@ -2341,7 +3157,7 @@
     """ 
 
 
- 114 ##"""Toggle AutoMinorUpgrade flag on RDS instance
+ 146 ##"""Toggle AutoMinorUpgrade flag on RDS instance
 
     'window' parameter needs to be in the format 'ddd:hh:mm-ddd:hh:mm' and
     have at least 30 minutes between start & end time.
@@ -2364,7 +3180,7 @@
     """ 
 
 
- 115 ##""" Scan DB instances for available engine upgrades
+ 147 ##""" Scan DB instances for available engine upgrades
 
     This will pull DB instances & check their specific engine for any
     engine version with higher release numbers than the current one
@@ -2386,7 +3202,7 @@
     """ 
 
 
- 116 ##"""Upgrades a RDS instance to the latest major/minor version available
+ 148 ##"""Upgrades a RDS instance to the latest major/minor version available
 
     Use of the 'immediate' flag (default False) will automatically upgrade
     the RDS engine disregarding the existing maintenance window.
@@ -2409,7 +3225,7 @@
     """ 
 
 
- 117 ##"""Deletes selected RDS instances
+ 149 ##"""Deletes selected RDS instances
 
     This will delete RDS instances. It is recommended to apply with a filter
     to avoid deleting all RDS instances in the account.
@@ -2429,7 +3245,7 @@
     """ 
 
 
- 118 ##"""Creates a manual snapshot of a RDS instance
+ 150 ##"""Creates a manual snapshot of a RDS instance
 
     :example:
 
@@ -2443,7 +3259,7 @@
     """ 
 
 
- 119 ##"""Change the allocated storage of an rds instance.
+ 151 ##"""Change the allocated storage of an rds instance.
 
     :example:
 
@@ -2489,7 +3305,7 @@
     """ 
 
 
- 120 ##"""
+ 152 ##"""
     Sets the 'BackupRetentionPeriod' value for automated snapshots,
     enforce (min, max, exact) sets retention days occordingly.
     :example:
@@ -2512,7 +3328,7 @@
     """ 
 
 
- 121 ##"""Filters RDS snapshots based on age (in days)
+ 153 ##"""Filters RDS snapshots based on age (in days)
 
     :example:
 
@@ -2530,65 +3346,7 @@
     """ 
 
 
- 122 ##"""Action to tag a RDS snapshot
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: rds-snapshot-add-owner
-                resource: rds-snapshot
-                filters:
-                  - type: age
-                    days: 7
-                    op: le
-                actions:
-                  - type: tag
-                    key: rds_owner
-                    value: rds_owner_name
-    """ 
-
-
- 123 ##"""Mark RDS snapshot resource for an operation at a later date
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: delete-stale-snapshots
-                resource: rds-snapshot
-                filters:
-                  - type: age
-                    days: 21
-                    op: eq
-                actions:
-                  - type: mark-for-op
-                    op: delete
-                    days: 7
-    """ 
-
-
- 124 ##"""Removes a tag/set of tags from a RDS snapshot resource
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: rds-snapshot-unmark
-                resource: rds-snapshot
-                filters:
-                  - "tag:rds_owner": present
-                actions:
-                  - type: remove-tag
-                    tags:
-                      - rds_owner
-    """ 
-
-
- 125 ##"""Deletes a RDS snapshot resource
+ 154 ##"""Deletes a RDS snapshot resource
 
     :example:
 
@@ -2606,9 +3364,41 @@
     """ 
 
 
- 126 ##"""
-    Applies value type filter on set db parameter values.
+ 155 ##"""Action to delete RDS Subnet Group
 
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any rds subnet groups.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-subnet-group-delete-unused
+                resource: rds-subnet-group
+                filters:
+                  - Instances: []
+                actions:
+                  - delete
+    """ 
+
+
+ 156 ##"""Filters all launch rds subnet groups that are not in use but exist
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-subnet-group-delete-unused
+                resource: rds-subnet-group
+                filters:
+                  - unused
+    """ 
+
+
+ 157 ##"""
+    Applies value type filter on set db parameter values.
     :example:
 
         .. code-block: yaml
@@ -2624,7 +3414,7 @@
     """ 
 
 
- 127 ##"""Mark a RDS cluster for specific custodian action
+ 158 ##"""Mark a RDS cluster for specific custodian action
 
     :example:
 
@@ -2642,7 +3432,7 @@
     """ 
 
 
- 128 ##"""Mark/tag a RDS cluster with a key/value
+ 159 ##"""Mark/tag a RDS cluster with a key/value
 
     :example:
 
@@ -2660,7 +3450,7 @@
     """ 
 
 
- 129 ##"""Removes a tag or set of tags from RDS clusters
+ 160 ##"""Removes a tag or set of tags from RDS clusters
 
     :example:
 
@@ -2677,7 +3467,7 @@
     """ 
 
 
- 130 ##"""Action to delete a RDS cluster
+ 161 ##"""Action to delete a RDS cluster
 
     To prevent unwanted deletion of clusters, it is recommended to apply a
     filter to the rule
@@ -2702,7 +3492,7 @@
     """ 
 
 
- 131 ##"""
+ 162 ##"""
     Action to set the retention period on rds cluster snapshots,
     enforce (min, max, exact) sets retention days occordingly.
 
@@ -2725,7 +3515,7 @@
     """ 
 
 
- 132 ##"""Action to create a snapshot of a rds cluster
+ 163 ##"""Action to create a snapshot of a rds cluster
 
     :example:
 
@@ -2739,7 +3529,7 @@
     """ 
 
 
- 133 ##"""Filters rds cluster snapshots based on age (in days)
+ 164 ##"""Filters rds cluster snapshots based on age (in days)
 
     :example:
 
@@ -2755,7 +3545,7 @@
     """ 
 
 
- 134 ##"""Action to delete rds cluster snapshots
+ 165 ##"""Action to delete rds cluster snapshots
 
     To prevent unwanted deletion of rds cluster snapshots, it is recommended
     to apply a filter to the rule
@@ -2776,7 +3566,7 @@
     """ 
 
 
- 135 ##""" Action to copy an RDS parameter group.
+ 166 ##""" Action to copy an RDS parameter group.
 
     :example:
 
@@ -2793,7 +3583,7 @@
     """ 
 
 
- 136 ##""" Action to copy an RDS cluster parameter group.
+ 167 ##""" Action to copy an RDS cluster parameter group.
 
     :example:
 
@@ -2810,7 +3600,7 @@
     """ 
 
 
- 137 ##"""Action to delete an RDS parameter group
+ 168 ##"""Action to delete an RDS parameter group
 
     :example:
 
@@ -2826,7 +3616,7 @@
     """ 
 
 
- 138 ##"""Action to delete an RDS cluster parameter group
+ 169 ##"""Action to delete an RDS cluster parameter group
 
     :example:
 
@@ -2842,7 +3632,7 @@
     """ 
 
 
- 139 ##"""Action to modify an RDS parameter group
+ 170 ##"""Action to modify an RDS parameter group
 
     :example:
 
@@ -2863,7 +3653,7 @@
     """ 
 
 
- 140 ##"""Action to modify an RDS cluster parameter group
+ 171 ##"""Action to modify an RDS cluster parameter group
 
     :example:
 
@@ -2884,7 +3674,7 @@
     """ 
 
 
- 141 ##""" Matches if an redshift database is in the default vpc
+ 172 ##""" Matches if an redshift database is in the default vpc
 
     :example:
 
@@ -2898,7 +3688,7 @@
     """ 
 
 
- 142 ##"""Filter redshift clusters based on parameter values
+ 173 ##"""Filter redshift clusters based on parameter values
 
     :example:
 
@@ -2915,7 +3705,7 @@
     """ 
 
 
- 143 ##"""Action to delete a redshift cluster
+ 174 ##"""Action to delete a redshift cluster
 
     To prevent unwanted deletion of redshift clusters, it is recommended to
     apply a filter to the rule
@@ -2937,7 +3727,7 @@
     """ 
 
 
- 144 ##"""Action to set the snapshot retention period (in days)
+ 175 ##"""Action to set the snapshot retention period (in days)
 
     :example:
 
@@ -2957,7 +3747,7 @@
     """ 
 
 
- 145 ##"""Action to take a snapshot of a redshift cluster
+ 176 ##"""Action to take a snapshot of a redshift cluster
 
     :example:
 
@@ -2976,7 +3766,7 @@
     """ 
 
 
- 146 ##"""Action to enable enhanced vpc routing on a redshift cluster
+ 177 ##"""Action to enable enhanced vpc routing on a redshift cluster
 
     More: https://goo.gl/espcOF
 
@@ -2998,7 +3788,7 @@
     """ 
 
 
- 147 ##"""Action to create an action to be performed at a later time
+ 178 ##"""Action to create an action to be performed at a later time
 
     :example:
 
@@ -3022,7 +3812,7 @@
     """ 
 
 
- 148 ##"""Action to add tag/tags to a redshift cluster
+ 179 ##"""Action to add tag/tags to a redshift cluster
 
     :example:
 
@@ -3040,7 +3830,7 @@
     """ 
 
 
- 149 ##"""Action to remove tag/tags from a redshift cluster
+ 180 ##"""Action to remove tag/tags from a redshift cluster
 
     :example:
 
@@ -3057,7 +3847,7 @@
     """ 
 
 
- 150 ##"""Action to remove tags from a redshift cluster
+ 181 ##"""Action to remove tags from a redshift cluster
 
     This can be used to prevent reaching the ceiling limit of tags on a
     resource
@@ -3081,7 +3871,7 @@
     """ 
 
 
- 151 ##"""Filters redshift snapshots based on age (in days)
+ 182 ##"""Filters redshift snapshots based on age (in days)
 
     :example:
 
@@ -3097,7 +3887,7 @@
     """ 
 
 
- 152 ##"""Filters redshift snapshots based on age (in days)
+ 183 ##"""Filters redshift snapshots based on age (in days)
 
     :example:
 
@@ -3115,7 +3905,7 @@
     """ 
 
 
- 153 ##"""Action to create a delayed actions to be performed on a redshift snapshot
+ 184 ##"""Action to create a delayed actions to be performed on a redshift snapshot
 
     :example:
 
@@ -3138,7 +3928,7 @@
     """ 
 
 
- 154 ##"""Action to add tag/tags to a redshift snapshot
+ 185 ##"""Action to add tag/tags to a redshift snapshot
 
     :example:
 
@@ -3156,7 +3946,7 @@
     """ 
 
 
- 155 ##"""Action to remove tag/tags from a redshift snapshot
+ 186 ##"""Action to remove tag/tags from a redshift snapshot
 
     :example:
 
@@ -3173,7 +3963,7 @@
     """ 
 
 
- 156 ##"""Filters cross-account access to S3 buckets
+ 187 ##"""Filters cross-account access to S3 buckets
 
     :example:
 
@@ -3188,7 +3978,7 @@
     """ 
 
 
- 157 ##"""Filters for all S3 buckets that have global-grants
+ 188 ##"""Filters for all S3 buckets that have global-grants
 
     :example:
 
@@ -3204,7 +3994,7 @@
     """ 
 
 
- 158 ##"""Find buckets with set of named policy statements.
+ 189 ##"""Find buckets with set of named policy statements.
 
     :example:
 
@@ -3220,7 +4010,7 @@
     """ 
 
 
- 159 ##"""Find buckets with missing encryption policy statements.
+ 190 ##"""Find buckets with missing encryption policy statements.
 
     :example:
 
@@ -3234,7 +4024,7 @@
     """ 
 
 
- 160 ##"""Find buckets missing a set of named policy statements.
+ 191 ##"""Find buckets missing a set of named policy statements.
 
     :example:
 
@@ -3250,7 +4040,52 @@
     """ 
 
 
- 161 ##"""Action to remove policy statements from S3 buckets
+ 192 ##"""Filter based on bucket notification configuration.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-incorrect-notification
+                resource: s3
+                filters:
+                  - type: bucket-notification
+                    kind: lambda
+                    key: Id
+                    value: "IncorrectLambda"
+                    op: eq
+                actions:
+                  - type: delete-bucket-notification
+                    statement_ids: matched
+    """ 
+
+
+ 193 ##"""Action to add or update policy statements to S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: force-s3-https
+                resource: s3
+                actions:
+                  - type: set-statements
+                    statements:
+                      - Sid: "DenyHttp"
+                        Effect: "Deny"
+                        Action: "s3:GetObject"
+                        Principal:
+                          AWS: "*"
+                        Resource: "arn:aws:s3:::{bucket_name}/*"
+                        Condition:
+                          Bool:
+                            "aws:SecureTransport": false
+    """ 
+
+
+ 194 ##"""Action to remove policy statements from S3 buckets
 
     :example:
 
@@ -3270,7 +4105,7 @@
     """ 
 
 
- 162 ##"""Action to enable/suspend versioning on a S3 bucket
+ 195 ##"""Action to enable/suspend versioning on a S3 bucket
 
     Note versioning can never be disabled only suspended.
 
@@ -3295,7 +4130,7 @@
     """ 
 
 
- 163 ##"""Action to enable/disable logging on a S3 bucket.
+ 196 ##"""Action to enable/disable logging on a S3 bucket.
 
     Target bucket ACL must allow for WRITE and READ_ACP Permissions
     Not specifying a target_prefix will default to the current bucket name.
@@ -3317,7 +4152,7 @@
     """ 
 
 
- 164 ##"""Action attaches lambda encryption policy to S3 bucket
+ 197 ##"""Action attaches lambda encryption policy to S3 bucket
 
     supports attachment via lambda bucket notification or sns notification
     to invoke lambda. a special topic value of `default` will utilize
@@ -3337,7 +4172,7 @@
     """ 
 
 
- 165 ##"""Action to apply an encryption policy to S3 buckets
+ 198 ##"""Action to apply an encryption policy to S3 buckets
 
     :example:
 
@@ -3355,7 +4190,7 @@
     """ 
 
 
- 166 ##"""Action to encrypt unencrypted S3 objects
+ 199 ##"""Action to encrypt unencrypted S3 objects
 
     :example:
 
@@ -3371,7 +4206,7 @@
     """ 
 
 
- 167 ##"""Filter and return buckets are log destinations.
+ 200 ##"""Filter and return buckets are log destinations.
 
     Not suitable for use in lambda on large accounts, This is a api
     heavy process to detect scan all possible log sources.
@@ -3394,7 +4229,7 @@
     """ 
 
 
- 168 ##"""Deletes global grants associated to a S3 bucket
+ 201 ##"""Deletes global grants associated to a S3 bucket
 
     :example:
 
@@ -3410,7 +4245,7 @@
     """ 
 
 
- 169 ##"""Action to create tags on a S3 bucket
+ 202 ##"""Action to create tags on a S3 bucket
 
     :example:
 
@@ -3429,7 +4264,7 @@
     """ 
 
 
- 170 ##"""Action schedules custodian to perform an action at a certain date
+ 203 ##"""Action schedules custodian to perform an action at a certain date
 
     :example:
 
@@ -3449,7 +4284,7 @@
     """ 
 
 
- 171 ##"""Removes tag/tags from a S3 object
+ 204 ##"""Removes tag/tags from a S3 object
 
     :example:
 
@@ -3466,7 +4301,7 @@
     """ 
 
 
- 172 ##"""Action deletes a S3 bucket
+ 205 ##"""Action deletes a S3 bucket
 
     :example:
 
@@ -3485,7 +4320,75 @@
     """ 
 
 
- 173 ##"""Action to remove policy statements from SNS
+ 206 ##"""Action applies a lifecycle policy to versioned S3 buckets
+
+    The schema to supply to the rule follows the schema here: goo.gl/yULzNc
+
+    To delete a lifecycle rule, supply Status=absent
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-apply-lifecycle
+                resource: s3
+                actions:
+                  - type: configure-lifecycle
+                    rules:
+                      - ID: my-lifecycle-id
+                        Status: Enabled
+                        Prefix: foo/
+                        Transitions:
+                          - Days: 60
+                            StorageClass: GLACIER
+
+    """ 
+
+
+ 207 ##"""Action enables default encryption on S3 buckets
+
+    `enabled`: boolean Optional: Defaults to True
+    `crypto`: aws:kms | AES256` Optional: Defaults to AES256
+    `key`: arn, alias, or kms id key
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enable-default-encryption-kms
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                  # enabled: true <------ optional (true by default)
+                    crypto: aws:kms
+                    key: 1234abcd-12ab-34cd-56ef-1234567890ab
+
+              - name: s3-enable-default-encryption-kms-alias
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                  # enabled: true <------ optional (true by default)
+                    crypto: aws:kms
+                    key: alias/some/alias/key
+
+              - name: s3-enable-default-encryption-aes256
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                  # crypto: AES256 <----- optional (AES256 by default)
+                  # enabled: true <------ optional (true by default)
+
+              - name: s3-disable-default-encryption
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                    enabled: false
+    """ 
+
+
+ 208 ##"""Action to remove policy statements from SNS
 
     :example:
 
@@ -3502,7 +4405,7 @@
     """ 
 
 
- 174 ##"""Filter SQS queues which have cross account permissions
+ 209 ##"""Filter SQS queues which have cross account permissions
 
     :example:
 
@@ -3516,7 +4419,7 @@
     """ 
 
 
- 175 ##"""Action to remove policy statements from SQS
+ 210 ##"""Action to remove policy statements from SQS
 
     :example:
 
@@ -3533,7 +4436,62 @@
     """ 
 
 
- 176 ##"""Action to delete a SQS queue
+ 211 ##"""Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: sqs-delete-unused
+                resource: sqs
+                filters:
+                  - "tag:custodian_cleanup": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Unused queues"
+                    op: delete
+                    days: 7
+    """ 
+
+
+ 212 ##"""Action to create tag(s) on a queue
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: tag-sqs
+                resource: sqs
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """ 
+
+
+ 213 ##"""Action to remove tag(s) on a queue
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: sqs-remove-tag
+                resource: sqs
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """ 
+
+
+ 214 ##"""Action to delete a SQS queue
 
     To prevent unwanted deletion of SQS queues, it is recommended
     to include a filter
@@ -3552,7 +4510,7 @@
     """ 
 
 
- 177 ##"""Action to set encryption key on SQS queue
+ 215 ##"""Action to set encryption key on SQS queue
 
     :example:
 
@@ -3569,7 +4527,7 @@
     """ 
 
 
- 178 ##"""Are flow logs enabled on the resource.
+ 216 ##"""Are flow logs enabled on the resource.
 
     ie to find all vpcs with flows logs disabled we can do this
 
@@ -3607,7 +4565,7 @@
     """ 
 
 
- 179 ##"""Filter VPCs based on Security Group attributes
+ 217 ##"""Filter VPCs based on Security Group attributes
 
     :example:
 
@@ -3623,7 +4581,7 @@
     """ 
 
 
- 180 ##"""Filter to just vpc security groups that are not used.
+ 218 ##"""Filter to just vpc security groups that are not used.
 
     We scan all extant enis in the vpc to get a baseline set of groups
     in use. Then augment with those referenced by launch configs, and
@@ -3646,7 +4604,7 @@
     """ 
 
 
- 181 ##"""Filter to security groups that are used.
+ 219 ##"""Filter to security groups that are used.
 
     This operates as a complement to the unused filter for multi-step
     workflows.
@@ -3663,7 +4621,7 @@
     """ 
 
 
- 182 ##"""Filter to find security groups that contain stale references
+ 220 ##"""Filter to find security groups that contain stale references
     to other groups that are either no longer present or traverse
     a broken vpc peering connection. Note this applies to VPC
     Security groups only and will implicitly filter security groups.
@@ -3682,7 +4640,7 @@
     """ 
 
 
- 183 ##"""Filter that returns any security group that exists within the default vpc
+ 221 ##"""Filter that returns any security group that exists within the default vpc
 
     :example:
 
@@ -3696,79 +4654,7 @@
     """ 
 
 
- 184 ##"""Filter for verifying security group ingress and egress permissions
-
-    All attributes of a security group permission are available as
-    value filters.
-
-    If multiple attributes are specified the permission must satisfy
-    all of them. Note that within an attribute match against a list value
-    of a permission we default to or.
-
-    If a group has any permissions that match all conditions, then it
-    matches the filter.
-
-    Permissions that match on the group are annotated onto the group and
-    can subsequently be used by the remove-permission action.
-
-    We have specialized handling for matching `Ports` in ingress/egress
-    permission From/To range. The following example matches on ingress
-    rules which allow for a range that includes all of the given ports.
-
-    .. code-block: yaml
-
-      - type: ingress
-        Ports: [22, 443, 80]
-
-    As well for verifying that a rule only allows for a specific set of ports
-    as in the following example. The delta between this and the previous
-    example is that if the permission allows for any ports not specified here,
-    then the rule will match. ie. OnlyPorts is a negative assertion match,
-    it matches when a permission includes ports outside of the specified set.
-
-    .. code-block: yaml
-
-      - type: ingress
-        OnlyPorts: [22]
-
-    For simplifying ipranges handling which is specified as a list on a rule
-    we provide a `Cidr` key which can be used as a value type filter evaluated
-    against each of the rules. If any iprange cidr match then the permission
-    matches.
-
-    .. code-block: yaml
-
-      - type: ingress
-        IpProtocol: -1
-        FromPort: 445
-
-    We also have specialized handling for matching self-references in
-    ingress/egress permissions. The following example matches on ingress
-    rules which allow traffic its own same security group.
-
-    .. code-block: yaml
-
-      - type: ingress
-        SelfReference: True
-
-    As well for assertions that a ingress/egress permission only matches
-    a given set of ports, *note* OnlyPorts is an inverse match.
-
-    .. code-block: yaml
-
-      - type: egress
-        OnlyPorts: [22, 443, 80]
-
-      - type: egress
-        Cidr:
-          value_type: cidr
-          op: in
-          value: x.y.z
-
-    """ 
-
-
- 185 ##"""Action to delete security group(s)
+ 222 ##"""Action to delete security group(s)
 
     It is recommended to apply a filter to the delete policy to avoid the
     deletion of all security groups returned.
@@ -3787,7 +4673,7 @@
     """ 
 
 
- 186 ##"""Action to remove ingress/egress rule(s) from a security group
+ 223 ##"""Action to remove ingress/egress rule(s) from a security group
 
     :example:
 
@@ -3808,7 +4694,7 @@
     """ 
 
 
- 187 ##"""Network interface subnet filter
+ 224 ##"""Network interface subnet filter
 
     :example:
 
@@ -3824,7 +4710,7 @@
     """ 
 
 
- 188 ##"""Network interface security group filter
+ 225 ##"""Network interface security group filter
 
     :example:
 
@@ -3841,7 +4727,7 @@
     """ 
 
 
- 189 ##"""Remove security groups from an interface.
+ 226 ##"""Remove security groups from an interface.
 
     Can target either physical groups as a list of group ids or
     symbolic groups like 'matched' or 'all'. 'matched' uses
@@ -3871,7 +4757,7 @@
     """ 
 
 
- 190 ##"""Filter network acls by the attributes of their attached subnets.
+ 227 ##"""Filter network acls by the attributes of their attached subnets.
 
     :example:
 
@@ -3887,7 +4773,7 @@
     """ 
 
 
- 191 ##"""Filter network acls by those that allow access to s3 cidrs.
+ 228 ##"""Filter network acls by those that allow access to s3 cidrs.
 
     Defaults to filtering those nacls that do not allow s3 communication.
 
