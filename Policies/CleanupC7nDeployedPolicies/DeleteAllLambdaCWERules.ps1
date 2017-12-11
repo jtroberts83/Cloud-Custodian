@@ -11,9 +11,7 @@ $TotalAPICalls = 0
 $Count = 0
 $TotalAccounts = 0
 $Mode = $null
-$PasswordCount = 0
-$LatestAviatrix = @()
-$LatestPublic = @()
+
 
 ## YOU WILL NEED TO DOWNLOAD curl.exe to C:\temp directory or change this code to use whatever method you prefer to get the instance creds.
 
@@ -33,7 +31,7 @@ Write-Host "Credentials successfully obtained through Instance! " -ForegroundCol
 ## Downloads a csv file listing all the account numbers to run this against.  You can change this to point to local file or hardcoded array
     Try
     {
-	    Copy-S3Object -BucketName agt-apache-resource-tagger -Key UnresolvedResources/NewAccounts/AccountNumbers.csv -LocalFile C:\temp\AccountNumbers.csv -ErrorAction Stop -AccessKey $LocalAccessKey -SecretKey $LocalSecretAccessKey -SessionToken $LocalSessionToken
+	    Copy-S3Object -BucketName  -Key /AccountNumbers.csv -LocalFile C:\temp\AccountNumbers.csv -ErrorAction Stop -AccessKey $LocalAccessKey -SecretKey $LocalSecretAccessKey -SessionToken $LocalSessionToken
         Write-Host "AccountNumbers.csv was successfully downloaded from S3" -ForegroundColor Green 
         $Accounts = Get-Content C:\temp\AccountNumbers.csv | ConvertFrom-Json
 	}
