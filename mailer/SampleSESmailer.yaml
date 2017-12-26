@@ -1,5 +1,5 @@
 debug: True
-queue_url: https://sqs.us-east-1.amazonaws.com/XXXXXXXXXXX/agt-cloud-custodian-mailer
+queue_url: https://sqs.us-east-1.amazonaws.com/XXXXXXXXXXX/cloud-custodian-mailer
 
 from_address: CloudCustodian@Company.com
 
