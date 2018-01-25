@@ -1,0 +1,7 @@
+
+- account_id: '<Account_Number>'
+  name: <Account_Name>
+  email: EmailForGuardDuty@email.com
+  role: arn:aws:iam::<Account_Number>:role/<Role_Name>
+  tags:
+    - prod
