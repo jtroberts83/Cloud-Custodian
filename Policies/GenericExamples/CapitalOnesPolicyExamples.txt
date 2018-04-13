@@ -3296,8 +3296,8 @@ Find rds instances that are not encrypted
                     name: FreeStorageSpace
                     percent-attr: AllocatedStorage
                     attr-multiplier: 1073741824
-                    value: 90
-                    op: greater-than
+                    value: 20
+                    op: less-than
                 actions:
                   - type: resize
                     percent: -30
@@ -3307,7 +3307,7 @@ Find rds instances that are not encrypted
 
  152 ##"""
     Sets the 'BackupRetentionPeriod' value for automated snapshots,
-    enforce (min, max, exact) sets retention days occordingly.
+    enforce (min, max, exact) sets retention days accordingly.
     :example:
 
         .. code-block: yaml
@@ -3494,7 +3494,7 @@ Find rds instances that are not encrypted
 
  162 ##"""
     Action to set the retention period on rds cluster snapshots,
-    enforce (min, max, exact) sets retention days occordingly.
+    enforce (min, max, exact) sets retention days accordingly.
 
     :example:
 
