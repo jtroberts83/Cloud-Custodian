@@ -3263,7 +3263,7 @@ Find rds instances that are not encrypted
 
     :example:
 
-       This will find databases using over 85% of their allocated
+       This will find databases using over 90% of their allocated
        storage, and resize them to have an additional 30% storage
        the resize here is async during the next maintenance.
 
