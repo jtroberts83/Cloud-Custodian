@@ -6,8 +6,8 @@
 ## Written by Jamison Roberts 2017 - Updated July 21 2018
 ##
 ## This script is a AWS UserData script designed for use on an AWS single instance AutoScaling Group using a AmazonLinux AMI
-## Set your AutoScaling Group to 0 instances with a schedule to spin up 1 new instance each day.  You don't need to specify a
-## schedule to shut the instance off as it will adjust it's own AutoScaling Group back to 0 instances when it's done.
+## Set your AutoScaling Group to 0 instances with a schedule to spin up 1 new instance each day.  
+## You DON'T need to specify a schedule to shut the instance OFF as it will adjust it's own AutoScaling Group back to 0 instances when it's done.
 ## This assumes you keep your Cloud Custodian c7n-org config and policies in S3 and this script saves the logs to the same bucket
 ## RECOMMENDATIONS:  If running against a large amount of accounts ( over 30 or 40) use a single m5.24xlarge server for your ASG instance and watch this puppy fly!
 ################################################################################
