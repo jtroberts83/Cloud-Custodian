@@ -5,6 +5,9 @@ export AWS_DEFAULT_REGION='us-east-1'
 ##  SET YOUR S3 BUCKET NAME HERE WHICH HOSTS YOUR C7N-ORG CONFIG AND POLICIES
 RESOURCE_BUCKET='YOUR-S3-BUCKET-NAME'
 
+## Set your cell phone number to be used with AWS SNS to send you a txt when the server starts it's scan.
+CellPhoneNumber = '13193339999'  
+
 ## Install the needed components like git, dos2unix, gcc, pip, boto3, virtualenv
 yum install git -y
 yum install dos2unix -y
@@ -89,24 +92,24 @@ aws s3 cp /root/start-$NumberOfAccounts.txt s3://$RESOURCE_BUCKET/start-$NumberO
 
 
 ## Send txt message notification to cell phone indicating it is starting it's run
-aws sns publish --phone-number "1YOUR-Cell-Phone#" --message "Executing Custodian Scan Now"
+aws sns publish --phone-number $CellPhoneNumber --message "Executing Custodian Scan Now"
 
 
 for policyname in "${policyfiles[@]}"; do
-  echo "Running custodian with policy file $policyname"
-	POLICY_LOG_PATH=$policyname.txt
-  
-	## If its a regional policy run it against the multipls regions
-	if [[ $policyname == *"regional"* ]]; then
-		   c7n-org run -c /root/config-Regional.yaml -u /tmp/allregional.yaml -s /root/org-log --metrics --region us-east-1 --region eu-west-1 |& tee -a $POLICY_PATH                
-		   ObjectName="${policyname:1}"
-		   aws s3 cp $POLICY_PATH s3://$RESOURCE_BUCKET/$ObjectName
-		fi
-	else ## If its a global policy run it against us-east-1 only
-		c7n-org run -c /root/config-Global.yaml -u /tmp/allglobal.yaml -s /root/org-log --metrics --region us-east-1 |& tee -a $POLICY_PATH
-		ObjectName="${policyname:1}"
-		aws s3 cp $POLICY_PATH s3://$RESOURCE_BUCKET/$ObjectName
-	fi
+    echo "Running custodian with policy file $policyname"
+    POLICY_LOG_PATH=$policyname.txt
+
+    ## If its a regional policy run it against the multipls regions
+    if [[ $policyname == *"regional"* ]]; then
+       c7n-org run -c /root/config-Regional.yaml -u /tmp/allregional.yaml -s /root/org-log --metrics --region us-east-1 --region eu-west-1 |& tee -a $POLICY_PATH                
+       ObjectName="${policyname:1}"
+       aws s3 cp $POLICY_PATH s3://$RESOURCE_BUCKET/$ObjectName
+    
+    else ## If its a global policy run it against us-east-1 only
+	c7n-org run -c /root/config-Global.yaml -u /tmp/allglobal.yaml -s /root/org-log --metrics --region us-east-1 |& tee -a $POLICY_PATH
+	ObjectName="${policyname:1}"
+	aws s3 cp $POLICY_PATH s3://$RESOURCE_BUCKET/$ObjectName
+    fi
 done
 
 
