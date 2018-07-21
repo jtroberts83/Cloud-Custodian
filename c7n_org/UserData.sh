@@ -1,11 +1,15 @@
 #!/bin/bash
 
+################################################################################
+## Written by Jamison Roberts 2017
+################################################################################
+
 export AWS_DEFAULT_REGION='us-east-1'
 
 ####  Set Variables Here ######
 RESOURCE_BUCKET='YOUR-S3-BUCKET-NAME' ##  SET YOUR S3 BUCKET NAME HERE WHICH HOSTS YOUR C7N-ORG CONFIG AND POLICIES
-CellPhoneNumber = '13193339999'   ## Set your cell phone number to be used with AWS SNS to send you a txt when the server starts it's scan.
-ASGName = 'CloudCustodianASGName' # The name of your single instance ASG.  Apply a schedule to the ASG to spin up server every day then this script will shut it down when done.
+CellPhoneNumber = '13193339999'       ## Set your cell phone number to be used with AWS SNS to send you a txt when the server starts it's scan.
+ASGName = 'CloudCustodianASGName'     ## The name of your single instance ASG. Apply a schedule to the ASG to spin up server every day then this script will shut it down when done.
 
 
 
