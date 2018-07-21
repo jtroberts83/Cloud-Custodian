@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ################################################################################
-## Written by Jamison Roberts 2017
+## Written by Jamison Roberts 2017 - Updated July 21 2018
 ################################################################################
 
 export AWS_DEFAULT_REGION='us-east-1'
