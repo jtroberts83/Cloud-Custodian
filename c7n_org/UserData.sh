@@ -2,11 +2,12 @@
 
 export AWS_DEFAULT_REGION='us-east-1'
 
-##  SET YOUR S3 BUCKET NAME HERE WHICH HOSTS YOUR C7N-ORG CONFIG AND POLICIES
-RESOURCE_BUCKET='YOUR-S3-BUCKET-NAME'
+####  Set Variables Here ######
+RESOURCE_BUCKET='YOUR-S3-BUCKET-NAME' ##  SET YOUR S3 BUCKET NAME HERE WHICH HOSTS YOUR C7N-ORG CONFIG AND POLICIES
+CellPhoneNumber = '13193339999'   ## Set your cell phone number to be used with AWS SNS to send you a txt when the server starts it's scan.
+ASGName = 'CloudCustodianASGName' # The name of your single instance ASG.  Apply a schedule to the ASG to spin up server every day then this script will shut it down when done.
 
-## Set your cell phone number to be used with AWS SNS to send you a txt when the server starts it's scan.
-CellPhoneNumber = '13193339999'  
+
 
 ## Install the needed components like git, dos2unix, gcc, pip, boto3, virtualenv
 yum install git -y
@@ -115,3 +116,6 @@ done
 
 touch /root/end.txt
 aws s3 cp /root/end.txt s3://$RESOURCE_BUCKET/end.txt
+
+
+aws autoscaling update-auto-scaling-group --region us-east-1 --auto-scaling-group-name $ASGName --min-size 0 --max-size 0 --desired-capacity 0
