@@ -6,7 +6,8 @@ import datetime
 ##  Fill Out These Variables:
 RoleToAssumeInEachAccount = 'Cloud_Custodian_Role'
 SupportCaseSubject = 'service-limit-increase needed'
-##  The following is vars to the S3 bucket and file which lists all your account numbers and names (You must create this)
+      ##  The following is vars to the S3 bucket and file which lists all your account numbers and names (You must create this)
+      ## The csv must be in the following format:  ["123456789999:account-alias-name1", "99987654321:account-alias-name2", "55544446666888:account-alias-name3"]
 s3bucket = 's3bucketname'
 Accounts = 'PathToS3Object/AccountNumbersAndNames.csv'
 
