@@ -1,3 +1,16 @@
+###########################################################################################################
+##    AWS Support Case Duplicator  - Created By Jamison Roberts 2017
+##    Use to open duplicate support cases/limit increase requests into all your specified accounts
+##    
+##    To use this script you need to first create a csv file containing your account numbers and names (format below in vars section)
+##    then host the csv file in a private S3 bucket.
+##    Open a support case/limit increase in the account you are running this Lambda function in
+##    make sure and use a unique Support Case Subject when creating the case as that is how this script knows which case to duplicate
+##    Make sure you fill in the variables below
+##
+############################################################################################################
+
+
 import boto3
 import json
 from botocore.client import Config
