@@ -9,7 +9,7 @@
 
 
 
-**ACCOUNT:**
+## **ACCOUNT:**
 
     - source: signin.amazonaws.com
       event: ConsoleLogin
@@ -17,7 +17,7 @@
 [ConsoleLogin Example Policy - Detect And Notify On Root Console Logins](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ConsoleLogin.yaml)
 
 
-**ACM - AWS Certificate Manager:**
+## **ACM - AWS Certificate Manager:**
 
     - source: acm.amazonaws.com
       event: ImportCertificate
@@ -29,7 +29,7 @@
 [ImportCertificate and RequestCertificate Example Policy - Detect And Delete Insecure Certs](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ImportRequestCertificate.yaml)
 
 
-**ALB - Application Load Balancers:**
+## **ALB - Application Load Balancers:**
 
     - source: "elasticloadbalancing.amazonaws.com"
       event: CreateListener
@@ -45,7 +45,7 @@
       
 [CreateLoadBalancer, CreateListener, ModifyListener Example Policy - Update ALBs To TLS1.2](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateLoadBalancerCreateModifyListener.yaml)      
       
-**AMI - Amazon Machine Image:**
+## **AMI - Amazon Machine Image:**
 
     - source: ec2.amazonaws.com
       event: CopyImage
@@ -61,7 +61,7 @@
 
 [ModifyImageAttribute Example Policy - Detect And Remediate Public AMI](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ModifyImageAttribute.yaml)
 
-**APIGATEWAY - Rest API:**
+## **APIGATEWAY - Rest API:**
 
     - source: apigateway.amazonaws.com
       event: CreateRestApi
@@ -69,7 +69,7 @@
 
 
 
-**ASG - EC2 Autoscaling Group:**
+## **ASG - EC2 Autoscaling Group:**
 
     - source: autoscaling.amazonaws.com
       event: CreateAutoScalingGroup
@@ -77,7 +77,7 @@
 
 
 
-**CFN - CloudFormation Templates/Stacks:**
+## **CFN - CloudFormation Templates/Stacks:**
 
     - source: cloudformation.amazonaws.com
       event: CreateStack
@@ -85,7 +85,7 @@
 
 
 
-**CLOUDFRONT - Distribution:**
+## **CLOUDFRONT - Distribution:**
 
     - source: cloudfront.amazonaws.com
       event: CreateDistribution
@@ -97,7 +97,7 @@
 
 [CreateDistribution, UpdateDistribution Example Policy - Remove Allow-All Access](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateUpdateDistribution.yaml)
 
-**CLOUDWATCH - Logs**
+## **CLOUDWATCH - Logs**
 
     - source: "logs.amazonaws.com"
       event: CreateLogGroup
@@ -109,7 +109,7 @@
 
 
 
-**CODEBUILD - Project:**
+## **CODEBUILD - Project:**
 
     - source: codebuild.amazonaws.com
       event: CreateNetworkInterface
@@ -121,7 +121,7 @@
 
 
 
-**COGNITO - Identity Pool:**
+## **COGNITO - Identity Pool:**
 
     - source: cognito-identity.amazonaws.com
       event: CreateIdentityPool
@@ -129,7 +129,7 @@
 
 [CreateIdentityPool Example Policy - Delete Anonymous Access Identity Pools](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateIdentityPool.yaml)
 
-**DATAPIPELINE - Pipeline:**
+## **DATAPIPELINE - Pipeline:**
 
     - source: datapipeline.amazonaws.com
       event: CreatePipeline
@@ -137,7 +137,7 @@
 
 
 
-**DMS - Database Migration Service:**
+## **DMS - Database Migration Service:**
 
     - source: "dms.amazonaws.com"
       event: CreateReplicationInstance
@@ -154,7 +154,7 @@
 [CreateReplicationInstance Example Policy - Terminate Public DMS Instances](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateReplicationInstance.yaml)
 [CreateEndpoint, ModifyEndpoint Example Policies - Ensure SSL Is Used On Endpoints](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateModifyEndpoint.yaml)
 
-**EC2 - Elastic Cloud Compute:**
+## **EC2 - Elastic Cloud Compute:**
 
     - source: ec2.amazonaws.com
       event: StartInstances
@@ -178,7 +178,7 @@
 
 [ModifySnapshotAttribute Example Policy - Detect Public Snapshots](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ModifySnapshotAttribute.yaml)
 
-**ECS - Elastic Container Service:**
+## **ECS - Elastic Container Service:**
 
     - source: ecs.amazonaws.com
       event: CreateService
@@ -190,7 +190,7 @@
 
 
 
-**EFS - Elastic File System:**
+## **EFS - Elastic File System:**
 
     - source: elasticfilesystem.amazonaws.com
       event: CreateFileSystem
@@ -198,7 +198,7 @@
 
 
 
-**EKS - Elastic Kubernetes Service:**
+## **EKS - Elastic Kubernetes Service:**
 
     - source: eks.amazonaws.com
       event: CreateCluster
@@ -206,7 +206,7 @@
 
 
 
-**ELB - Elastic Load Balancers (Classic):**
+## **ELB - Elastic Load Balancers (Classic):**
 
     - source: "elasticloadbalancing.amazonaws.com"
       event: CreateLoadBalancerListeners
@@ -230,7 +230,7 @@
 
 
 
-**EMR - Elastic Map Reduce:**
+## **EMR - Elastic Map Reduce:**
 
     - source: elasticmapreduce.amazonaws.com
       event: RunJobFlow
@@ -238,7 +238,7 @@
 
 
 
-**ES - Elasticsearch Service:**
+## **ES - Elasticsearch Service:**
 
     - source: es.amazonaws.com
       event: CreateElasticsearchDomain
@@ -246,7 +246,7 @@
 
 
 
-**IAM - Identity Access Manager:**
+## **IAM - Identity Access Manager:**
 
     - source: "iam.amazonaws.com"
       event: CreateUser
@@ -266,7 +266,7 @@
       
    
 
-**KINESIS - Data Streams:**
+## **KINESIS - Data Streams:**
 
     - source: "kinesis.amazonaws.com"
       event: "CreateStream"
@@ -274,7 +274,7 @@
       
 
 
-**KINESIS - Firehose:**
+## **KINESIS - Firehose:**
 
     - source: "firehose.amazonaws.com"
       event: "CreateDeliveryStream"
@@ -282,7 +282,7 @@
 
 
 
-**KMS - Key Management Service:**
+## **KMS - Key Management Service:**
 
     - source: kms.amazonaws.com
       event: CreateKey
@@ -290,7 +290,7 @@
 
 
 
-**LAMBDA - Serverless Functions:**
+## **LAMBDA - Serverless Functions:**
 
     - source: lambda.amazonaws.com
       event: AddPermission20150331
@@ -310,7 +310,7 @@
 
 
 
-**MQ - Message Broker:**
+## **MQ - Message Broker:**
 
     - source: amazonmq.amazonaws.com
       event: CreateBroker
@@ -318,7 +318,7 @@
 
 
 
-**RDS - Relational Database Service:**
+## **RDS - Relational Database Service:**
 
     - source: rds.amazonaws.com
       event: CreateDBCluster
@@ -330,7 +330,7 @@
 
 
 
-**REDSHIFT - Clusters:**
+## **REDSHIFT - Clusters:**
 
     - source: redshift.amazonaws.com
       event: CreateCluster
@@ -338,7 +338,7 @@
 
 
 
-**S3 - Simple Storage Service (Blob storage):**
+## **S3 - Simple Storage Service (Blob storage):**
 
     - source: s3.amazonaws.com
       event: CopyObject
@@ -354,7 +354,7 @@
 
 
 
-**SAGEMAKER - Notebooks:**
+## **SAGEMAKER - Notebooks:**
 
     - source: sagemaker.amazonaws.com
       event: CreateNotebookInstance
@@ -362,7 +362,7 @@
 
 
 
-**SECURITY-GROUP:**
+## **SECURITY-GROUP:**
 
     - source: ec2.amazonaws.com
       event: AuthorizeSecurityGroupEgress
@@ -386,7 +386,7 @@
       
       
 
-**SNS - Simple Notification Service:**
+## **SNS - Simple Notification Service:**
 
     - source: sns.amazonaws.com
       event: CreateTopic
@@ -398,7 +398,7 @@
 
 
 
-**SQS - Simple Queue Service:**
+## **SQS - Simple Queue Service:**
 
     - source: sqs.amazonaws.com
       event: CreateQueue
@@ -418,7 +418,7 @@
 
 
 
-**SUBNET:**
+## **SUBNET:**
 
     - source: ec2.amazonaws.com
       event: CreateSubnet
@@ -430,7 +430,7 @@
       
 
 
-**VPC:**
+## **VPC:**
 
     - source: ec2.amazonaws.com
       event: CreateVpcPeeringConnection
