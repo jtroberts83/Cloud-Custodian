@@ -1,0 +1,40 @@
+policies:
+
+- name: cloudfront-update-insecure-viewer-protocol
+  resource: distribution
+  mode:
+      type: cloudtrail
+      events:
+        - source: cloudfront.amazonaws.com
+          event: CreateDistribution
+          ids: "responseElements.distribution.id"
+        - source: cloudfront.amazonaws.com
+          event: UpdateDistribution
+          ids: "responseElements.distribution.id"  
+  description: |
+    Detects if a CloudFront distribution allows HTTP unsecure access policy
+    and if it does, update the access policy to redirect-to-https and notify customer
+  filters:
+      - type: value
+        key: "DefaultCacheBehavior.ViewerProtocolPolicy"
+        op: eq
+        value: "allow-all"
+  actions:
+    - type: set-protocols
+      ViewerProtocolPolicy: redirect-to-https
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "CloudFront - Insecure Viewer Protocol Updated - [custodian {{ account }} - {{ region }}]"
+      violation_desc: |
+          The below CloudFront Distribution was using the allow-all viewer protocol policy to allow unsecure HTTP traffic access.
+          Company and industry regulations require HTTPS viewer protocols.  Your protocol has been updated to satisfy this requirement.
+      action_desc: |
+          Actions Taken:  The CloudFront Distribution has been updated to use the redirect-to-https viewer protocol policy.
+      to:
+        - resource-owner
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
