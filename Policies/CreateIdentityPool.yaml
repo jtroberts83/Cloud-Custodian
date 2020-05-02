@@ -1,0 +1,35 @@
+policies:
+
+
+
+- name: cognito-identity-pool-anonymous-delete
+  mode:
+     type: cloudtrail
+     events:
+        - source: cognito-identity.amazonaws.com
+          event: CreateIdentityPool
+          ids: "responseElements.identityPoolId"
+  description: |
+      Finds newly created Cognito Identity Pools which allow unauthorized
+      access and delete them and email the customer.
+  resource: identity-pool
+  filters:
+      - "AllowUnauthenticatedIdentities": true
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "Cognito - Identity Pool Deleted - [custodian {{ account }} - {{ region }}]"
+      violation_desc: |
+          The below Cognito Identity Pool was created with anonymous access enabled.  Allowing unauthenticated users is prohibited
+          without the proper security exception. The Cognito Identity Pool has been deleted.
+      action_desc: |
+          Actions Taken:  The Cognito Identity Pool has been deleted and must be recreated without allowing unauthorized access.
+      to:
+        - event-owner
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
