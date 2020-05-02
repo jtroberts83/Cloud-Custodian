@@ -1,0 +1,35 @@
+policies:
+
+- name: ebs-detect-public-snapshot
+  mode:
+    type: cloudtrail
+    events:
+        - source: "ec2.amazonaws.com"
+          event: "ModifySnapshotAttribute"
+          ids: "requestParameters.snapshotId"
+  description: |
+    Detects if a snapshot is made public and notifies Security, customer and customer's manager to manually remediate the public access
+  resource: ebs-snapshot
+  filters:
+       - type: cross-account
+         whitelist_from:
+                 url: s3://my-s3-bucket/My_AWS_Account_Numbers.csv
+                 format: csv2dict
+  actions:
+   - type: notify
+     template: default.html
+     priority_header: 1
+     subject: "EBS Snapshot Made Public - [custodian {{ account }} - {{ region }}]"
+     violation_desc: |
+          The EBS Snapshot listed in the below table was granted public permissions which is prohibited by Security.
+     action_desc: |
+          Actions Taken -  Manual remediation of the public snapshot access is required.  Please modify the snapshot permissions to be Private instead of Public.
+          This incident has been reported to Security team and must be resolved immediately.
+     email_ldap_username_manager: True
+     to:
+        - resource-owner
+        - event-owner
+     transport:
+         type: sqs
+         queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+         region: us-east-1
