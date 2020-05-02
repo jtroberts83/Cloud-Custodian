@@ -1,0 +1,36 @@
+policies:
+
+
+- name: ebs-remediate-public-ami
+  mode:
+    type: cloudtrail
+    events:
+        - source: "ec2.amazonaws.com"
+          event: "ModifyImageAttribute"
+          ids: "requestParameters.imageId"
+  description: |
+    Detects if a AMI is made public and removes the public launch permissions and notifies Security, and customer.
+  resource: ami
+  filters:
+       - type: cross-account
+         whitelist_from:
+                 url: s3://my-s3-bucket/MyAWSAccountNumbers.csv
+                 format: csv2dict
+  actions:
+   - remove-launch-permissions
+   - type: notify
+     template: default.html
+     priority_header: 1
+     subject: "EBS AMI - Public Launch Permissions Removed - [custodian {{ account }} - {{ region }}]"
+     violation_desc: |
+          The EBS AMI listed in the below table was granted public launch permissions which are prohibited by security.
+     action_desc: |
+          Actions Taken - Your AMI's public launch permissions have been removed by Cloud Custodian.
+          This incident has been reported to the security team.
+     to:
+        - resource-owner
+        - event-owner
+     transport:
+         type: sqs
+         queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+         region: us-east-1
