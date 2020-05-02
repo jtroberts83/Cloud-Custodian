@@ -1,0 +1,31 @@
+policies:
+
+- name: root-login-detected
+  resource: account
+  description: |
+    Notifies on Root User logins in AWS
+  mode:
+     type: cloudtrail
+     events:
+        - source: signin.amazonaws.com
+          event: ConsoleLogin
+          ids: "userIdentity.arn"
+  filters:
+    - type: event
+      key: "detail.userIdentity.type"
+      value_type: swap
+      op: in
+      value: Root
+  actions:
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "Account - Root Login Detected - [custodian {{ account }} - {{ region }}]"
+      violation_desc: "The Root User has logged in:"
+      action_desc: "Actions Taken:  Notify Only"
+      to:
+        - 
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
