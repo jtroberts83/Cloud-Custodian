@@ -1,0 +1,53 @@
+policies:
+
+
+- name: app-elb-update-old-ssl-to-tls-1-2
+  resource: app-elb
+  mode:
+     type: cloudtrail
+     events:
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: CreateLoadBalancer
+          ids: "requestParameters.name"
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: ModifyListener
+          ids: "responseElements.listeners[].loadBalancerArn"
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: CreateListener
+          ids: "requestParameters.loadBalancerArn"
+     packages:
+        - botocore
+        - boto3
+        - urllib3
+        - certifi
+  description: |
+     When a new application load-balancer is created using SSL but without TLSv1.2, it will be switched to use a TLSv1.2 policy instead, per security policy.
+  filters:
+    - type: listener
+      key: Protocol
+      value: HTTPS
+    - type: listener
+      key: SslPolicy
+      value: ['ELBSecurityPolicy-TLS-1-2-2017-01']
+      op: ni
+      matched: true
+  actions:
+    - type: modify-listener
+      sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: App ELB - SSL Cipher Changed To TLSv1.2 - [custodian {{ account }} - {{ region }}]
+      violation_desc: |
+        The following application load-balancers ciphers were not using the required SSL Policy of ELBSecurityPolicy-TLS-1-2-2017-01
+        and have been upgraded to meet the company minimum standards of TLSv1.2. Per company security policy, all SSL ciphers must be using a minimum of TLSv1.2 or higher.
+      action_desc: |
+        Actions Required - Verify the below application load-balancers functionality as it's security policy has been updated by Cloud Custodian
+        to make the ELB compliant by using SSL Cipher of TLSv1.2 with SSL Policy ELBSecurityPolicy-TLS-1-2-2017-01.  Ensure your ELB connections are still working.
+      to:
+        - event-owner
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
