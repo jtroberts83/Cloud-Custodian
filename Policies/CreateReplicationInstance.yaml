@@ -1,0 +1,32 @@
+policies:
+
+
+- name: dms-replication-instance-public-terminate
+  resource: dms-instance
+  description: |
+    This policy will detect the creation of public dms-instances and terminate them and email the customer
+  mode:
+     type: cloudtrail
+     events:
+        - source: "dms.amazonaws.com"
+          event: CreateReplicationInstance
+          ids: "requestParameters.replicationInstanceIdentifier"
+  filters:
+    - "PubliclyAccessible": true
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: DMS Replication Instance - Public Instance Deleted - [custodian {{ account }} - {{ region }}]
+      violation_desc: |
+        The following DMS Replication Instances have been deleted as they were launched as publicly available which is forbidden by Security.
+      action_desc: |
+        Actions Required - The below instance has been deleted.  You will need to launch a new DMS Replication Instance which is internally facing only.
+      to:
+        - event-owner
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
