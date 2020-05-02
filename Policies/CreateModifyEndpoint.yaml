@@ -1,0 +1,78 @@
+policies:
+
+- name: dms-endpoint-enable-ssl-require-realtime
+  resource: dms-endpoint
+  description: |
+    If the SSL Mode is none for a DMS Endpoint with engine of sql, mongo, or postgres
+    it gets turned on to Require SSL setting
+  mode:
+      type: cloudtrail
+      events:
+        - source: dms.amazonaws.com
+          event: CreateEndpoint
+          ids: "responseElements.endpoint.endpointArn"
+        - source: dms.amazonaws.com
+          event: ModifyEndpoint
+          ids: "responseElements.endpoint.endpointArn"
+  filters:
+    - or:
+        - SslMode: none
+        - type: event
+          key: "detail.requestParameters.sslMode"
+          op: eq
+          value: "none"
+    - or:
+      - EngineName: sqlserver
+      - EngineName: mongodb
+      - EngineName: postgres
+  actions:
+    - type: modify-endpoint
+      SslMode: require
+
+
+- name: dms-delete-endpoint-missing-ssl-ca-cert-realtime
+  resource: dms-endpoint
+  description: |
+    If the SSL Mode is none for a DMS Endpoint with engine that is aurora, mariadb, mysql, sybase, oracle, azuredb, or db2,
+    the endpoint is deleted and an email is sent stating that CA Certificates need to be used as a requirement
+  mode:
+      type: cloudtrail
+      events:
+        - source: dms.amazonaws.com
+          event: CreateEndpoint
+          ids: "responseElements.endpoint.endpointArn"
+        - source: dms.amazonaws.com
+          event: ModifyEndpoint
+          ids: "responseElements.endpoint.endpointArn"
+  filters:
+    - or:
+        - SslMode: none
+        - type: event
+          key: "detail.requestParameters.sslMode"
+          op: eq
+          value: "none"
+    - or:
+        - EngineName: aurora
+        - EngineName: mariadb
+        - EngineName: mysql
+        - EngineName: sybase
+        - EngineName: oracle
+        - EngineName: azuredb
+        - EngineName: db2
+  actions:
+    - delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "DMS Endpoint Deleted As It's Non-Compliant! - [custodian {{ account }} - {{ region }}]"
+      violation_desc: "Per regulations all DMS Endpoints have to use SSL connections and yours was setup as 'none' for SSL mode!"
+      action_desc: |
+          Actions Taken:  You are required to enable SSL on your endpoint for a secure transmission of data.
+          This incident has been reported and the invalid endpoint has been deleted.  Please launch a new endpoint using SSL
+      to:
+        - resource-owner
+        - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
