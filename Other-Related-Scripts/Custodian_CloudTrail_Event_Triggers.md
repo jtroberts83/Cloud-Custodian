@@ -14,7 +14,7 @@
     - source: signin.amazonaws.com
       event: ConsoleLogin
       ids: "userIdentity.arn"
-
+[ConsoleLogin Example Policy - Detect And Notify On Root Console Logins](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ConsoleLogin.yaml)
 
 
 **ACM - AWS Certificate Manager:**
@@ -26,7 +26,7 @@
     - source: acm.amazonaws.com
       event: RequestCertificate
       ids: "responseElements.certificateArn"
-
+[ImportCertificate and RequestCertificate Example Policy - Detect And Delete Insecure Certs](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ImportRequestCertificate.yaml)
 
 
 **ALB - Application Load Balancers:**
@@ -43,7 +43,7 @@
       event: ModifyListener
       ids: "responseElements.listeners[].loadBalancerArn"      
       
-      
+[CreateLoadBalancer, CreateListener, ModifyListener Example Policy - Update ALBs To TLS1.2](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateLoadBalancerCreateModifyListener.yaml)      
       
 **AMI - Amazon Machine Image:**
 
@@ -59,7 +59,7 @@
       event: ModifyImageAttribute
       ids: "requestParameters.imageId"
 
-
+[ModifyImageAttribute Example Policy - Detect And Remediate Public AMI](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ModifyImageAttribute.yaml)
 
 **APIGATEWAY - Rest API:**
 
@@ -95,7 +95,7 @@
       event: UpdateDistribution
       ids: "responseElements.distribution.id"  
 
-
+[CreateDistribution, UpdateDistribution Example Policy - Remove Allow-All Access](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateUpdateDistribution.yaml)
 
 **CLOUDWATCH - Logs**
 
@@ -127,7 +127,7 @@
       event: CreateIdentityPool
       ids: "responseElements.identityPoolId"
 
-
+[CreateIdentityPool Example Policy - Delete Anonymous Access Identity Pools](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateIdentityPool.yaml)
 
 **DATAPIPELINE - Pipeline:**
 
@@ -151,7 +151,8 @@
       event: ModifyEndpoint
       ids: "responseElements.endpoint.endpointArn"
 
-
+[CreateReplicationInstance Example Policy - Terminate Public DMS Instances](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateReplicationInstance.yaml)
+[CreateEndpoint, ModifyEndpoint Example Policies - Ensure SSL Is Used On Endpoints](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateModifyEndpoint.yaml)
 
 **EC2 - Elastic Cloud Compute:**
 
@@ -175,7 +176,7 @@
       event: ModifySnapshotAttribute
       ids: "requestParameters.snapshotId"    
 
-
+[ModifySnapshotAttribute Example Policy - Detect Public Snapshots](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ModifySnapshotAttribute.yaml)
 
 **ECS - Elastic Container Service:**
 
