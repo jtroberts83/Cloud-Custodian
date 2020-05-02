@@ -1,0 +1,45 @@
+policies:
+
+######################################################################################
+####    ACM CERTIFICATE CIPHER TOO LOW
+######################################################################################
+
+
+- name: acm-certificate-low-cipher-delete
+  resource: acm-certificate
+  mode:
+      type: cloudtrail
+      events:
+          - source: acm.amazonaws.com
+            event: RequestCertificate
+            ids: "responseElements.certificateArn"
+          - source: acm.amazonaws.com
+            event: ImportCertificate
+            ids: "responseElements.certificateArn"
+      packages:
+          - botocore
+          - boto3
+          - urllib3
+          - certifi
+  description: |
+      If a new ACM certificate is created which is using RSA 1024 bit encryption, the certificate will be deleted and owner emailed.
+  filters:
+      - "KeyAlgorithm": "RSA-1024"
+  actions:
+      - delete
+      - type: notify
+        template: default.html
+        priority_header: 1
+        subject: "ACM Certificate Deleted - Low security RSA 1024 Bit Used - [custodian {{ account }} - {{ region }}]"
+        violation_desc: |
+            The ACM Certificate listed below has been deleted as it was created with a low security RSA 1024 bit encryption cipher.
+            Having certificates with low security ciphers are easy targets for hackers and should not be used.
+        action_desc: |
+            Actions Taken - The ACM certificate has been deleted.  A new certificate will need to be created with a RSA encryption cipher of either 2048 or 4096 bit.
+        to:
+            - event-owner
+            - resource-owner
+        transport:
+            type: sqs
+            queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+            region: us-east-1
