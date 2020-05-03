@@ -1,0 +1,65 @@
+policies:
+
+
+
+
+- name: redshift-unencrypted-mark
+  resource: redshift
+  description: |
+      If a new Redshift Cluster is launched without encryption 
+      the cluster gets tagged for deletion.
+  mode:
+    type: cloudtrail
+    events:
+        - source: redshift.amazonaws.com
+          event: CreateCluster
+          ids: 'responseElements.clusterIdentifier'
+    packages:
+        - botocore
+        - boto3
+        - urllib3
+        - certifi
+  filters:
+    - "Encrypted": false
+  actions:
+    - type: tag
+      key: CheckEncryptionCompliance
+      value: "true"
+
+
+
+- name: redshift-unencrypted-delete
+  resource: redshift
+  description: |
+    Deletes tagged unencrypted or public Redshift Clusters 
+    that were launched in the last 15 minutes.
+  mode:
+    type: periodic
+    schedule: "rate(15 minutes)"
+    packages:
+        - botocore
+        - boto3
+        - urllib3
+        - certifi
+  filters:
+    - "tag:CheckEncryptionCompliance": present
+    - "Encrypted": false
+    - "ClusterStatus": "available"
+  actions:
+    - type: delete
+      skip-snapshot: true
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "Redshift - Unencrypted Cluster Deleted - [custodian {{ account }} - {{ region }}]"
+      violation_desc: |
+          Clusters that are not encrypted are prohibited by Security.
+      action_desc: |
+         Actions Taken: Cloud Custodian has deleted your Redshift Cluster which was not encrypted.
+         Please recreate your Redshift Cluster using encryption.
+      to:
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
