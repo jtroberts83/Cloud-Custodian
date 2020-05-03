@@ -1,0 +1,39 @@
+policies:
+
+
+- name: elb-delete-no-ssl-attach
+  resource: elb
+  mode:
+      type: cloudtrail
+      events:
+        - source: elasticloadbalancing.amazonaws.com
+          event: RegisterInstancesWithLoadBalancer
+          ids: "requestParameters.loadBalancerName"
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: CreateLoadBalancerListeners
+          ids: "requestParameters.loadBalancerName"
+      packages:
+        - botocore
+        - boto3
+        - urllib3
+        - certifi
+  filters:
+   - not:
+       - type: is-ssl
+  actions:
+    - type: delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: ELB Classic - Deleted Due To Missing SSL Cipher - [custodian {{ account }} - {{ region }}]
+      violation_desc: |
+        The following ELB Classic's have been deleted as they were not using SSL per Security minimum standards of SSL TLSv1.2 and had an EC2 Instance attached. Per company security policy, all connections must use SSL and the SSL ciphers must be using a minimum of TLSv1.2 or higher.
+      action_desc: |
+        Actions Required - Please create a new ELB Classic using SSL cipher of TLSv1.2 before attaching your EC2 Instances to the ELB.
+      to:
+        - event-owner
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
