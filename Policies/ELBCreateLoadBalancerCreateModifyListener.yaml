@@ -1,0 +1,69 @@
+policies:
+
+
+- name: elb-listener-updated-or-created-old-ssl-to-tls-1-2
+  resource: elb
+  mode:
+     type: cloudtrail
+     events:
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: ModifyListener
+          ids: "responseElements.listeners[].loadBalancerArn"
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: CreateListener
+          ids: "requestParameters.loadBalancerArn"
+        - source: "elasticloadbalancing.amazonaws.com"
+          event: CreateLoadBalancerPolicy
+          ids: "requestParameters.loadBalancerName"
+        - source: elasticloadbalancing.amazonaws.com
+          event: CreateLoadBalancer
+          ids: "responseElements.loadBalancers[].loadBalancerArn"
+  description: |
+     When a elb listener policy is modified or created with a SSL Protocol of SSLv2, 
+     SSLv3, TLSv1, or TLSv1.1, it will be swithced to use a TLSv1.2 policy instead per company policy.
+  filters:
+      - type: ssl-policy
+        matching: "^Protocol-"
+        blacklist:
+                - "Protocol-SSLv2"
+                - "Protocol-SSLv3"
+                - "Protocol-TLSv1"
+                - "Protocol-TLSv1.1"
+  actions:
+    - type: set-ssl-listener-policy
+      name: ELB-TLS-1-2
+      attributes:
+            - Protocol-TLSv1.2
+            - Server-Defined-Cipher-Order
+            - ECDHE-ECDSA-AES128-GCM-SHA256
+            - ECDHE-RSA-AES128-GCM-SHA256
+            - ECDHE-ECDSA-AES128-SHA256
+            - ECDHE-RSA-AES128-SHA256
+            - ECDHE-ECDSA-AES256-GCM-SHA384
+            - ECDHE-RSA-AES256-GCM-SHA384
+            - ECDHE-ECDSA-AES256-SHA384
+            - ECDHE-RSA-AES256-SHA384
+            - AES128-GCM-SHA256
+            - AES128-SHA256
+            - AES256-GCM-SHA384
+            - AES256-SHA256
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: ELB Classic - SSL Cipher Changed To TLSv1.2 - [custodian {{ account }} - {{ region }}]
+      violation_desc: |
+           The following ELB Classic's ciphers have been upgraded to use company minimum standards of TLSv1.2. Per company security policy, all SSL ciphers must be using a minimum of TLSv1.2 or higher.
+      action_desc: |
+           Actions Required - Verify your ELB Classics functionality as it's security policy has been updated by Cloud Custodian to make the ELB compliant by using SSL Cipher of TLSv1.2.  Ensure your ELB connections are still working.
+      to:
+        - event-owner
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+
+
