@@ -1,0 +1,74 @@
+policies:
+
+
+- name: efs-realtime-non-kms-delete
+  resource: efs
+  description: If a new Elastic File System is created without encryption it will be deleted.
+  mode:
+     type: cloudtrail
+     events:
+        - source: elasticfilesystem.amazonaws.com
+          event: CreateFileSystem
+          ids: "responseElements.fileSystemId"
+     packages:
+        - botocore
+        - boto3
+        - urllib3
+        - certifi
+  filters:
+        - "Encrypted": false
+  actions:
+    - type: tag
+      key: CheckCompliance
+      value: "true"  
+    - type: delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "Elastic File System - Unencrypted Deleted - [custodian {{ account }} - {{ region }}]"
+      violation_desc: |
+          Elastic File Systems that are not encrypted are prohibited by Security.
+      action_desc: |
+         Actions Taken: Cloud Custodian has deleted your Elastic File System which was not using encryption.
+         Please recreate your Elastic File System using encryption.
+      to:
+        - event-owner
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/12345678910/cloud-custodian-mailer
+        region: us-east-1
+
+
+
+- name: efs-periodic-non-kms-delete
+  resource: efs
+  description: If a new Elastic File System is created without encryption and initial policy missed any mount points, they will be deleted.
+  mode:
+     type: periodic
+     schedule: "rate(15 minutes)"
+     packages:
+        - botocore
+        - boto3
+        - urllib3
+        - certifi
+  filters:
+    - "tag:CheckCompliance": present
+    - "Encrypted": false
+  actions:
+    - type: delete
+    - type: notify
+      template: default.html
+      priority_header: 1
+      subject: "Elastic File System - Additional Unencrypted Deleted - [custodian {{ account }} - {{ region }}]"
+      violation_desc: |
+          Elastic File Systems that are not encrypted are prohibited by Security.
+      action_desc: |
+         Actions Taken: Cloud Custodian has deleted your Elastic File System which was not encrypted.
+         Please recreate your Elastic File System using encryption.
+      to:
+        - resource-owner
+      transport:
+        type: sqs
+        queue: https://sqs.us-east-1.amazonaws.com/123456789/cloud-custodian-mailer
+        region: us-east-1
