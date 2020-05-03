@@ -4,7 +4,7 @@
   
   
   *List Created By: Jamison Roberts May 1st 2020*
-
+  * Cloud Custodian Does Have Some Built In Event [Shortcuts](https://github.com/cloud-custodian/cloud-custodian/blob/master/c7n/cwe.py#L28-L69)
 
 
 
@@ -203,7 +203,7 @@
       event: CreateFileSystem
       ids: "responseElements.fileSystemId"
 
-
+* [CreateFileSystem Example Policy - Delete Unencrypted EFS](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateFileSystem.yaml)
 
 ## **EKS - Elastic Kubernetes Service:**
 
@@ -235,7 +235,8 @@
       event: RegisterInstancesWithLoadBalancer
       ids: "requestParameters.loadBalancerName"
 
-
+* [CreateLoadBalancerListeners, RegisterInstancesWithLoadBalancer Example Policy - Delete Non-SSL ELBs](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateLoadBalancerListenersRegisterInstancesWithLoadBalancer.yaml)
+* [CreateLoadBalancer, Example Policy - Update To TLS1.2](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ELBCreateLoadBalancerCreateModifyListener.yaml)
 
 ## **EMR - Elastic Map Reduce:**
 
