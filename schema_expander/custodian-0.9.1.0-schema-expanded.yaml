@@ -1,0 +1,4932 @@
+Cloud Custodian Quick Reference
+ 
+Version 0.9.1.0 (ONLY AWS SHOWN)
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.account:
+  actions:
+  - enable-cloudtrail
+  - enable-data-events
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - request-limit-increase
+  - set-ebs-encryption
+  - set-password-policy
+  - set-s3-public-block
+  - set-shield-advanced
+  - set-xray-encrypt
+  - webhook
+  filters:
+  - check-cloudtrail
+  - check-config
+  - credential
+  - default-ebs-encryption
+  - event
+  - finding
+  - glue-security-config
+  - guard-duty
+  - has-virtual-mfa
+  - iam-summary
+  - missing
+  - ops-item
+  - password-policy
+  - s3-public-block
+  - service-limit
+  - shield-enabled
+  - value
+  - xray-encrypt-key
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.acm-certificate:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - health-event
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.alarm:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ami:
+  actions:
+  - auto-tag-user
+  - copy
+  - copy-related-tag
+  - deregister
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-launch-permissions
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - image-age
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - unused
+  - value
+
+
+Help
+----
+
+Resource manager for v2 ELBs (AKA ALBs and NLBs).
+    
+
+aws.app-elb:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-listener
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-s3-logging
+  - set-shield
+  - set-waf
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - default-vpc
+  - event
+  - finding
+  - health-event
+  - healthcheck-protocol-mismatch
+  - is-logging
+  - is-not-logging
+  - listener
+  - marked-for-op
+  - metrics
+  - network-location
+  - ops-item
+  - security-group
+  - shield-enabled
+  - subnet
+  - tag-count
+  - target-group
+  - value
+  - vpc
+  - waf-enabled
+
+
+Help
+----
+
+Resource manager for v2 ELB target groups.
+    
+
+aws.app-elb-target-group:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - default-vpc
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.asg:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - propagate-tags
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - resize
+  - resume
+  - suspend
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - capacity-delta
+  - config-compliance
+  - event
+  - finding
+  - image
+  - image-age
+  - invalid
+  - launch-config
+  - marked-for-op
+  - metrics
+  - network-location
+  - not-encrypted
+  - offhour
+  - onhour
+  - ops-item
+  - progagated-tags
+  - security-group
+  - subnet
+  - tag-count
+  - user-data
+  - valid
+  - value
+  - vpc-id
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.backup-plan:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.backup-vault:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.batch-compute:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - update-environment
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.batch-definition:
+  actions:
+  - deregister
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cache-cluster:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - snapshot
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - marked-for-op
+  - metrics
+  - network-location
+  - ops-item
+  - security-group
+  - subnet
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cache-snapshot:
+  actions:
+  - auto-tag-user
+  - copy-cluster-tags
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - age
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cache-subnet-group:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cfn:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-protection
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cloud-directory:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cloudhsm-cluster:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cloudsearch:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.cloudtrail:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-logging
+  - tag
+  - update-trail
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - is-shadow
+  - marked-for-op
+  - ops-item
+  - status
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.codebuild:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - security-group
+  - subnet
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.codecommit:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.codepipeline:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.config-recorder:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.config-rule:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - status
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.customer-gateway:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.datapipeline:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dax:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - update-cluster
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.directconnect:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.directory:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - ops-item
+  - security-group
+  - subnet
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.distribution:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - disable
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-attributes
+  - set-protocols
+  - set-shield
+  - set-waf
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - distribution-config
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - mismatch-s3-origin
+  - ops-item
+  - shield-enabled
+  - shield-metrics
+  - tag-count
+  - value
+  - waf-enabled
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dlm-policy:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dms-endpoint:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-endpoint
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dms-instance:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-instance
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - kms-key
+  - marked-for-op
+  - ops-item
+  - security-group
+  - subnet
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dynamodb-backup:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dynamodb-stream:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.dynamodb-table:
+  actions:
+  - auto-tag-user
+  - backup
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-stream
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - health-event
+  - kms-key
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ebs:
+  actions:
+  - auto-tag-user
+  - copy-instance-tags
+  - copy-related-tag
+  - delete
+  - detach
+  - encrypt-instance-volumes
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - snapshot
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - fault-tolerant
+  - finding
+  - health-event
+  - instance
+  - kms-alias
+  - marked-for-op
+  - metrics
+  - modifyable
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ebs-snapshot:
+  actions:
+  - auto-tag-user
+  - copy
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - age
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - skip-ami-snapshots
+  - tag-count
+  - unused
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ec2:
+  actions:
+  - auto-tag-user
+  - autorecover-alarm
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - propagate-spot-tags
+  - put-metric
+  - reboot
+  - remove-tag
+  - rename-tag
+  - resize
+  - send-command
+  - set-instance-profile
+  - set-monitoring
+  - snapshot
+  - start
+  - stop
+  - tag
+  - tag-trim
+  - terminate
+  - webhook
+  filters:
+  - check-permissions
+  - config-compliance
+  - default-vpc
+  - ebs
+  - ephemeral
+  - event
+  - finding
+  - health-event
+  - image
+  - image-age
+  - instance-age
+  - instance-attribute
+  - instance-uptime
+  - marked-for-op
+  - metrics
+  - network-location
+  - offhour
+  - onhour
+  - ops-item
+  - security-group
+  - singleton
+  - ssm
+  - ssm-compliance
+  - state-age
+  - subnet
+  - tag-count
+  - termination-protected
+  - user-data
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ec2-reserved:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ecr:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - set-immutability
+  - set-lifecycle
+  - set-scanning
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - lifecycle-rule
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ecs:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ecs-container-instance:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-state
+  - tag
+  - update-agent
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - taggable
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ecs-service:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - taggable
+  - task-definition
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ecs-task:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - stop
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - taggable
+  - task-definition
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ecs-task-definition:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.efs:
+  actions:
+  - auto-tag-user
+  - configure-lifecycle-policy
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - kms-key
+  - lifecycle-policy
+  - marked-for-op
+  - metrics
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.efs-mount-target:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.eks:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - update-config
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-group
+  - subnet
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.elastic-ip:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - release
+  - remove-tag
+  - rename-tag
+  - set-shield
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - shield-enabled
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.elasticache-group:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.elasticbeanstalk:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+Resource manager for Elasticbeanstalk Environments
+    
+
+aws.elasticbeanstalk-environment:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - terminate
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.elasticsearch:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - security-group
+  - subnet
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.elb:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - disable-s3-logging
+  - enable-s3-logging
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-shield
+  - set-ssl-listener-policy
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - default-vpc
+  - event
+  - finding
+  - health-event
+  - healthcheck-protocol-mismatch
+  - instance
+  - is-logging
+  - is-not-logging
+  - is-ssl
+  - marked-for-op
+  - metrics
+  - network-location
+  - ops-item
+  - security-group
+  - shield-enabled
+  - shield-metrics
+  - ssl-policy
+  - subnet
+  - tag-count
+  - value
+  - vpc
+
+
+Help
+----
+
+Resource manager for Elastic MapReduce clusters
+    
+
+aws.emr:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - terminate
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+Resource manager for EMR Security Configuration
+    
+
+aws.emr-security-configuration:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.eni:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - set-flow-log
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - flow-logs
+  - marked-for-op
+  - network-location
+  - ops-item
+  - security-group
+  - subnet
+  - tag-count
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.event-rule:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.event-rule-target:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.firehose:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - encrypt-s3-destination
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.fsx:
+  actions:
+  - auto-tag-user
+  - backup
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - update
+  - webhook
+  filters:
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.fsx-backup:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.gamelift-build:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.gamelift-fleet:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glacier:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-catalog:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - set-encryption
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - glue-security-config
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-classifier:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-connection:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-crawler:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-config
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-database:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-dev-endpoint:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-config
+  - subnet
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-job:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-config
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-ml-transform:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-security-configuration:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-table:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-trigger:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.glue-workflow:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-config
+  - value
+
+
+Help
+----
+
+Query resource manager for AWS health events
+    
+
+aws.health-event:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.healthcheck:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.hostedzone:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-query-logging
+  - set-shield
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - query-logging-enabled
+  - shield-enabled
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.hsm:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.hsm-client:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.hsm-hapg:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iam-certificate:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iam-group:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - check-permissions
+  - config-compliance
+  - event
+  - finding
+  - has-inline-policy
+  - has-users
+  - ops-item
+  - usage
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iam-policy:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - check-permissions
+  - config-compliance
+  - event
+  - finding
+  - has-allow-all
+  - ops-item
+  - unused
+  - usage
+  - used
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iam-profile:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - unused
+  - used
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iam-role:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-boundary
+  - set-policy
+  - tag
+  - webhook
+  filters:
+  - check-permissions
+  - config-compliance
+  - cross-account
+  - event
+  - finding
+  - has-inline-policy
+  - has-specific-managed-policy
+  - no-specific-managed-policy
+  - ops-item
+  - unused
+  - usage
+  - used
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iam-user:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-keys
+  - remove-tag
+  - set-boundary
+  - set-groups
+  - tag
+  - webhook
+  filters:
+  - access-key
+  - check-permissions
+  - config-compliance
+  - credential
+  - event
+  - finding
+  - group
+  - has-inline-policy
+  - marked-for-op
+  - mfa-device
+  - ops-item
+  - policy
+  - usage
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.identity-pool:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.internet-gateway:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.iot:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.kafka:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - set-monitoring
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.key-pair:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.kinesis:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - encrypt
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.kinesis-analytics:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.kms:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - grant-count
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.kms-key:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - set-rotation
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - key-rotation-status
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.lambda:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - set-concurrency
+  - tag
+  - webhook
+  filters:
+  - check-permissions
+  - config-compliance
+  - cross-account
+  - event
+  - event-source
+  - finding
+  - kms-key
+  - marked-for-op
+  - metrics
+  - network-location
+  - ops-item
+  - reserved-concurrency
+  - security-group
+  - subnet
+  - value
+  - vpc
+
+
+Help
+----
+
+Note custodian models the lambda layer version.
+
+Layers end up being a logical asset, the physical asset for use
+and management is the layer verison.
+
+To ease that distinction, we support querying just the latest
+layer version or having a policy against all layer versions.
+
+By default we query all versions, the following is an example
+to query just the latest.
+
+.. code-block:: yaml
+
+    policies:
+      - name: lambda-layer
+        resource: lambda
+        query:
+          - version: latest
+
+aws.lambda-layer:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.launch-config:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - age
+  - config-compliance
+  - event
+  - finding
+  - ops-item
+  - unused
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.launch-template-version:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.lightsail-db:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.lightsail-elb:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.lightsail-instance:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.log-group:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - retention
+  - set-encryption
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - last-write
+  - marked-for-op
+  - metrics
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.message-broker:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ml-model:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.nat-gateway:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.network-acl:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - s3-cidr
+  - subnet
+  - tag-count
+  - value
+
+
+Help
+----
+
+Resource for OpsItems in SSM OpsCenter
+https://docs.aws.amazon.com/systems-manager/latest/userguide/OpsCenter.html
+
+aws.ops-item:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - update
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.opswork-cm:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.opswork-stack:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - stop
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.peering-connection:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - missing-route
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.qldb:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.r53domain:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+Resource manager for RDS DB instances.
+    
+
+aws.rds:
+  actions:
+  - auto-patch
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-db
+  - modify-security-groups
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - resize
+  - retention
+  - set-public-access
+  - set-snapshot-copy-tags
+  - snapshot
+  - start
+  - stop
+  - tag
+  - tag-trim
+  - upgrade
+  - webhook
+  filters:
+  - config-compliance
+  - db-parameter
+  - default-vpc
+  - event
+  - finding
+  - health-event
+  - kms-alias
+  - marked-for-op
+  - metrics
+  - network-location
+  - offhour
+  - onhour
+  - ops-item
+  - security-group
+  - subnet
+  - tag-count
+  - upgrade-available
+  - value
+  - vpc
+
+
+Help
+----
+
+Resource manager for RDS clusters.
+    
+
+aws.rds-cluster:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-db-cluster
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - retention
+  - snapshot
+  - start
+  - stop
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - network-location
+  - offhour
+  - onhour
+  - ops-item
+  - security-group
+  - subnet
+  - tag-count
+  - value
+
+
+Help
+----
+
+Resource manager for RDS cluster parameter groups.
+    
+
+aws.rds-cluster-param-group:
+  actions:
+  - copy
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - modify
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+Resource manager for RDS cluster snapshots.
+    
+
+aws.rds-cluster-snapshot:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - age
+  - config-compliance
+  - cross-account
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+Resource manager for RDS parameter groups.
+    
+
+aws.rds-param-group:
+  actions:
+  - copy
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - modify
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rds-reserved:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+Resource manager for RDS DB snapshots.
+    
+
+aws.rds-snapshot:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - region-copy
+  - remove-tag
+  - restore
+  - tag
+  - webhook
+  filters:
+  - age
+  - config-compliance
+  - cross-account
+  - event
+  - finding
+  - latest
+  - marked-for-op
+  - onhour
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+RDS subnet group.
+
+aws.rds-subnet-group:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - unused
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rds-subscription:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.redshift:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - enable-vpc-routing
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-security-groups
+  - notify
+  - pause
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - resume
+  - retention
+  - set-logging
+  - set-public-access
+  - snapshot
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - default-vpc
+  - event
+  - finding
+  - kms-key
+  - logging
+  - marked-for-op
+  - metrics
+  - network-location
+  - offhour
+  - onhour
+  - ops-item
+  - param
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+Resource manager for Redshift snapshots.
+    
+
+aws.redshift-snapshot:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - revoke-access
+  - tag
+  - webhook
+  filters:
+  - age
+  - config-compliance
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+Redshift subnet group.
+
+aws.redshift-subnet-group:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rest-account:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - update
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rest-api:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - update
+  - webhook
+  filters:
+  - config-compliance
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rest-resource:
+  actions:
+  - delete-integration
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - update-integration
+  - update-method
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - rest-integration
+  - rest-method
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rest-stage:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - update
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rest-vpclink:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.route-table:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - route
+  - subnet
+  - tag-count
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.rrset:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.s3:
+  actions:
+  - attach-encrypt
+  - auto-tag-user
+  - configure-lifecycle
+  - copy-related-tag
+  - delete
+  - delete-bucket-notification
+  - delete-global-grants
+  - encrypt-keys
+  - encryption-policy
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - no-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - remove-website-hosting
+  - set-bucket-encryption
+  - set-inventory
+  - set-public-block
+  - set-replication
+  - set-statements
+  - tag
+  - toggle-logging
+  - toggle-versioning
+  - webhook
+  filters:
+  - bucket-encryption
+  - bucket-logging
+  - bucket-notification
+  - check-public-block
+  - config-compliance
+  - cross-account
+  - data-events
+  - event
+  - finding
+  - global-grants
+  - has-statement
+  - inventory
+  - is-log-target
+  - marked-for-op
+  - metrics
+  - missing-policy-statement
+  - no-encryption-statement
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sagemaker-endpoint:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sagemaker-endpoint-config:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sagemaker-job:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - stop
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sagemaker-model:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sagemaker-notebook:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - start
+  - stop
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - ops-item
+  - security-group
+  - subnet
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sagemaker-transform-job:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - stop
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.secrets-manager:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.security-group:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - patch
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-permissions
+  - remove-tag
+  - rename-tag
+  - set-permissions
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - default-vpc
+  - diff
+  - egress
+  - event
+  - finding
+  - ingress
+  - marked-for-op
+  - ops-item
+  - stale
+  - tag-count
+  - unused
+  - used
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.shield-attack:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.shield-protection:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.simpledb:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.snowball:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.snowball-cluster:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sns:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-policy
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - set-encryption
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.sqs:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - modify-policy
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-statements
+  - remove-tag
+  - set-encryption
+  - set-retention-period
+  - tag
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - kms-key
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ssm-activation:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ssm-managed-instance:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - send-command
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.ssm-parameter:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+AWS Step Functions State Machine
+
+aws.step-machine:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.storage-gateway:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - health-event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.streaming-distribution:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - disable
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.subnet:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - set-flow-log
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - flow-logs
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.support-case:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.transit-attachment:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.transit-gateway:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.user-pool:
+  actions:
+  - delete
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - event
+  - finding
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.vpc:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - set-flow-log
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - dhcp-options
+  - event
+  - finding
+  - flow-logs
+  - internet-gateway
+  - marked-for-op
+  - nat-gateway
+  - ops-item
+  - security-group
+  - subnet
+  - tag-count
+  - value
+  - vpc-attributes
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.vpc-endpoint:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - cross-account
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - security-group
+  - subnet
+  - tag-count
+  - value
+  - vpc
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.vpn-connection:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.vpn-gateway:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - normalize-tag
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - rename-tag
+  - tag
+  - tag-trim
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - ops-item
+  - tag-count
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.waf:
+  actions:
+  - invoke-lambda
+  - invoke-sfn
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.waf-regional:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - config-compliance
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - value
+
+
+Help
+----
+
+A Cloud Custodian resource
+
+aws.workspaces:
+  actions:
+  - auto-tag-user
+  - copy-related-tag
+  - invoke-lambda
+  - invoke-sfn
+  - mark-for-op
+  - notify
+  - post-finding
+  - post-item
+  - put-metric
+  - remove-tag
+  - tag
+  - webhook
+  filters:
+  - connection-status
+  - event
+  - finding
+  - marked-for-op
+  - metrics
+  - ops-item
+  - tag-count
+  - value
+
