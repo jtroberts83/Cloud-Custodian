@@ -10,7 +10,8 @@ sed -i -e 's/resources://g' schema_list
 # Clear our the schema_quick_reference.txt file with a hearder and new line
 echo "Cloud Custodian Quick Reference" > schema_quick_ref.txt
 echo " " >> schema_quick_ref.txt
-
+echo "Custodian Version:" >> schema_quick_ref.txt
+custodian version >> schema_quick_ref.txt
 # Reads the cleaned up schema_list file into variable $a as an array
 readarray a < schema_list
 
@@ -26,4 +27,5 @@ do
         custodian schema $resourceName >> schema_quick_ref.txt
     fi
 done
+cp schema_quick_ref.txt /tmp
 cat schema_quick_ref.txt
