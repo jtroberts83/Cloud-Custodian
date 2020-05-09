@@ -20,17 +20,16 @@ AWS resources in c7n v0.9.1:   170
 
 
 New Resources Added In New Schema:
-
-⭐  backup-vault
-⭐  elasticache-group
-⭐  emr-security-configuration
-⭐  glue-catalog
-⭐  glue-classifier
-⭐  glue-ml-transform
-⭐  glue-security-configuration
-⭐  glue-trigger
-⭐  glue-workflow
-⭐  qldb
+    ⭐  backup-vault
+    ⭐  elasticache-group
+    ⭐  emr-security-configuration
+    ⭐  glue-catalog
+    ⭐  glue-classifier
+    ⭐  glue-ml-transform
+    ⭐  glue-security-configuration
+    ⭐  glue-trigger
+    ⭐  glue-workflow
+    ⭐  qldb
 
 
 
