@@ -3,14 +3,14 @@ AWS resources in c7n v0.8.46.1:   160
 AWS resources in c7n v0.9.1:   170
 
 ⭐ New Items:
-    Resources: 10
-    Actions:  93
-    Filters:  24
+       Resources: 10
+       Actions:  93
+       Filters:  24
     
 ❌ Removed Items:
-    Resources: 0
-    Actions:  0
-    Filters:  26
+       Resources: 0
+       Actions:  0
+       Filters:  26
 
 
 
