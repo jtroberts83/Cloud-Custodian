@@ -17,14 +17,14 @@ AWS resources in c7n v0.9.1:    **170**
 
     Resources:  10
     Actions:  93
-    Filters:  26
+    Filters:  24
 
 
 ### ❌ Removed Items:
 
     Resources:  0
     Actions:  0
-    Filters:  28 
+    Filters:  26 
 
 
 # 
@@ -4238,9 +4238,7 @@ AWS resources in c7n v0.9.1:    **170**
     - tag-trim
     - webhook
   filters:
-⭐  - value
 ⭐  - vpc
-❌  - value
     - event
     - finding
     - marked-for-op
@@ -4248,6 +4246,7 @@ AWS resources in c7n v0.9.1:    **170**
     - route
     - subnet
     - tag-count
+    - value
 
 ```
 
@@ -4968,10 +4967,8 @@ AWS resources in c7n v0.9.1:    **170**
     - tag-trim
     - webhook
   filters:
-⭐  - value
 ⭐  - vpc
 ❌  - json-diff
-❌  - value
     - config-compliance
     - event
     - finding
@@ -4979,6 +4976,7 @@ AWS resources in c7n v0.9.1:    **170**
     - marked-for-op
     - ops-item
     - tag-count
+    - value
 
 ```
 
