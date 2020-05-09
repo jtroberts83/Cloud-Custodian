@@ -1,0 +1,787 @@
+
+GCP resources in c7n v0.8.46.1:   76
+GCP resources in c7n v0.9.1:   75
+
+New Items:
+    Resources: 0
+    Actions:  2
+    Filters:  0
+
+Removed Items:
+    Resources: 1
+    Actions:  2
+    Filters:  2
+
+
+👉👉 **ANY ITEMS WITH 🌟 NEXT TO THEM ARE NEW SINCE LAST RELEASE**
+👉👉 **ANY ITEMS WITH ❌ NEXT TO THEM ARE REMOVED SINCE LAST RELEASE**
+
+
+Old GCP Resources Removed In New Schema:
+
+❌  logsink
+
+
+
+gcp.app-engine:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.app-engine-certificate:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.app-engine-domain:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.app-engine-domain-mapping:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.app-engine-firewall-ingress-rule:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.autoscaler:
+  actions:
+    - notify
+    - post-finding
+    - set
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.bq-dataset:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.bq-job:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.bq-project:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.bq-table:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.bucket:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.build:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.cloudbilling-account:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.dataflow-job:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.disk:
+  actions:
+    - delete
+    - mark-for-op
+    - notify
+    - post-finding
+    - set-labels
+    - snapshot
+    - webhook
+  filters:
+    - event
+    - marked-for-op
+    - value
+
+
+gcp.dm-deployment:
+  actions:
+    - delete
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.dns-managed-zone:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.dns-policy:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.firewall:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.folder:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.function:
+  actions:
+    - delete
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.gke-cluster:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.gke-nodepool:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.iam-role:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.image:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.instance:
+  actions:
+🌟  - detach-disks
+    - delete
+    - mark-for-op
+    - notify
+    - post-finding
+    - set-labels
+    - start
+    - stop
+    - webhook
+  filters:
+    - event
+    - marked-for-op
+    - offhour
+    - onhour
+    - value
+
+
+gcp.instance-template:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.interconnect:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.interconnect-attachment:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.kms-cryptokey:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.kms-cryptokey-version:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.kms-keyring:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-address:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-backend-bucket:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-backend-service:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-forwarding-rule:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-global-address:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-global-forwarding-rule:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-health-check:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-http-health-check:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-https-health-check:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-ssl-certificate:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-ssl-policy:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-target-http-proxy:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-target-https-proxy:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-target-instance:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-target-pool:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-target-ssl-proxy:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-target-tcp-proxy:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.loadbalancer-url-map:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.log-exclusion:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.log-project-metric:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.log-project-sink:
+  actions:
+🌟  - delete
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+❌ ------------    REMOVED GCP RESOURCE  -  gcp.logsink   -------------- ❌
+
+logsink:
+     actions:
+❌   - notify
+❌   - webhook
+     filters:
+❌   - event
+❌   - value
+
+
+gcp.ml-model:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.organization:
+  actions:
+    - notify
+    - post-finding
+    - set-iam-policy
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.project:
+  actions:
+    - notify
+    - post-finding
+    - set-iam-policy
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.project-role:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.pubsub-snapshot:
+  actions:
+    - delete
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.pubsub-subscription:
+  actions:
+    - delete
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.pubsub-topic:
+  actions:
+    - delete
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.route:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.router:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.service:
+  actions:
+    - disable
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.service-account:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.snapshot:
+  actions:
+    - delete
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.sourcerepo:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.spanner-database-instance:
+  actions:
+    - delete
+    - notify
+    - set-iam-policy
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.spanner-instance:
+  actions:
+    - delete
+    - mark-for-op
+    - notify
+    - set
+    - set-iam-policy
+    - set-labels
+    - webhook
+  filters:
+    - event
+    - marked-for-op
+    - value
+
+
+gcp.sql-backup-run:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.sql-instance:
+  actions:
+    - delete
+    - notify
+    - stop
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.sql-ssl-cert:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.sql-user:
+  actions:
+    - notify
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.subnet:
+  actions:
+    - notify
+    - post-finding
+    - set-flow-log
+    - set-gcp-private
+    - webhook
+  filters:
+    - event
+    - value
+
+
+gcp.vpc:
+  actions:
+    - notify
+    - post-finding
+    - webhook
+  filters:
+    - event
+    - value
