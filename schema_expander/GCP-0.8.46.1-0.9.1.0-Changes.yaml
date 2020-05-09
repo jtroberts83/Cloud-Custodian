@@ -13,7 +13,7 @@ Removed Items:
     Filters:  2
 
 
-👉👉 **ANY ITEMS WITH 🌟 NEXT TO THEM ARE NEW SINCE LAST RELEASE**
+👉👉 **ANY ITEMS WITH ⭐ NEXT TO THEM ARE NEW SINCE LAST RELEASE**
 👉👉 **ANY ITEMS WITH ❌ NEXT TO THEM ARE REMOVED SINCE LAST RELEASE**
 
 
@@ -551,7 +551,7 @@ gcp.log-project-metric:
 
 gcp.log-project-sink:
   actions:
-🌟  - delete
+⭐  - delete
     - notify
     - webhook
   filters:
