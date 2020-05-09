@@ -5,12 +5,12 @@ AWS resources in c7n v0.9.1:   170
 New Items:
     Resources: 10
     Actions:  93
-    Filters:  26
+    Filters:  24
     
 Removed Items:
     Resources: 0
     Actions:  0
-    Filters:  28
+    Filters:  26
 
 
 👉👉 **ANY ITEMS WITH 🌟 NEXT TO THEM ARE NEW SINCE LAST RELEASE**
@@ -3281,9 +3281,7 @@ aws.route-table:
     - tag-trim
     - webhook
   filters:
-🌟  - value
 🌟  - vpc
-❌  - value
     - event
     - finding
     - marked-for-op
@@ -3291,6 +3289,7 @@ aws.route-table:
     - route
     - subnet
     - tag-count
+    - value
 
 
 aws.rrset:
@@ -3843,10 +3842,9 @@ aws.subnet:
     - tag-trim
     - webhook
   filters:
-🌟  - value
 🌟  - vpc
 ❌  - json-diff
-❌  - value
+    - value
     - config-compliance
     - event
     - finding
