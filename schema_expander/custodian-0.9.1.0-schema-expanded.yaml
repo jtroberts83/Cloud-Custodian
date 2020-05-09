@@ -265,7 +265,7 @@ aws.backup-plan:
  🌟 #############    NEW RESOURCE  -  aws.backup-vault     #############
 
 🌟 backup-vault:
-🌟   actions:
+    actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - invoke-lambda
@@ -278,14 +278,14 @@ aws.backup-plan:
 🌟   - remove-tag
 🌟   - tag
 🌟   - webhook
-🌟   filters:
+    filters:
 🌟   - event
 🌟   - finding
 🌟   - kms-key
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
 aws.batch-compute:
   actions:
@@ -1268,7 +1268,7 @@ aws.elastic-ip:
  🌟 #############    NEW RESOURCE  -  aws.elasticache-group     #############
 
 🌟 elasticache-group:
-🌟   actions:
+     actions:
 🌟   - invoke-lambda
 🌟   - invoke-sfn
 🌟   - notify
@@ -1276,13 +1276,13 @@ aws.elastic-ip:
 🌟   - post-item
 🌟   - put-metric
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - metrics
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
 aws.elasticbeanstalk:
   actions:
@@ -1420,7 +1420,7 @@ aws.emr:
  🌟 #############    NEW RESOURCE  -  aws.emr-security-configuration     #############
 
 🌟 emr-security-configuration:
-🌟   actions:
+    actions:
 🌟   - delete
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1429,12 +1429,12 @@ aws.emr:
 🌟   - post-item
 🌟   - put-metric
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
 aws.eni:
   actions:
@@ -1630,7 +1630,7 @@ aws.glacier:
  🌟 #############    NEW RESOURCE  -  aws.glue-catalog     #############
 
 🌟 glue-catalog:
-🌟   actions:
+     actions:
 🌟   - invoke-lambda
 🌟   - invoke-sfn
 🌟   - notify
@@ -1639,19 +1639,19 @@ aws.glacier:
 🌟   - put-metric
 🌟   - set-encryption
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - cross-account
 🌟   - event
 🌟   - finding
 🌟   - glue-security-config
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
  🌟 #############    NEW RESOURCE  -  aws.glue-classifier     #############
 
 🌟 glue-classifier:
-🌟   actions:
+     actions:
 🌟   - delete
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1660,12 +1660,12 @@ aws.glacier:
 🌟   - post-item
 🌟   - put-metric
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
 aws.glue-connection:
   actions:
@@ -1777,7 +1777,7 @@ aws.glue-job:
  🌟 #############    NEW RESOURCE  -  aws.glue-ml-transform     #############
 
 🌟 glue-ml-transform:
-🌟   actions:
+     actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - delete
@@ -1791,18 +1791,18 @@ aws.glue-job:
 🌟   - remove-tag
 🌟   - tag
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
  🌟 #############    NEW RESOURCE  -  aws.glue-security-configuration     #############
 
 🌟 glue-security-configuration:
-🌟   actions:
+     actions:
 🌟   - delete
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1811,12 +1811,12 @@ aws.glue-job:
 🌟   - post-item
 🌟   - put-metric
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
 aws.glue-table:
   actions:
@@ -1837,7 +1837,7 @@ aws.glue-table:
  🌟 #############    NEW RESOURCE  -  aws.glue-trigger     #############
 
 🌟 glue-trigger:
-🌟   actions:
+    actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - delete
@@ -1851,18 +1851,18 @@ aws.glue-table:
 🌟   - remove-tag
 🌟   - tag
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
-🌟 
+ 
 
  🌟 #############    NEW RESOURCE  -  aws.glue-workflow     #############
 
 🌟 glue-workflow:
-🌟   actions:
+     actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - delete
@@ -1876,15 +1876,14 @@ aws.glue-table:
 🌟   - remove-tag
 🌟   - tag
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - security-config
 🌟   - value
-🌟     
-🌟 
+
 
 aws.health-event:
   actions:
@@ -2665,10 +2664,10 @@ aws.peering-connection:
     - tag-count
     - value
 
- 🌟 #############    NEW RESOURCE  -  aws.qldb     #############
+🌟 #############    NEW RESOURCE  -  aws.qldb     #############
 
 🌟 qldb:
-🌟   actions:
+     actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - delete
@@ -2682,14 +2681,14 @@ aws.peering-connection:
 🌟   - remove-tag
 🌟   - tag
 🌟   - webhook
-🌟   filters:
+     filters:
 🌟   - config-compliance
 🌟   - event
 🌟   - finding
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
-🌟 
+
 
 aws.r53domain:
   actions:
