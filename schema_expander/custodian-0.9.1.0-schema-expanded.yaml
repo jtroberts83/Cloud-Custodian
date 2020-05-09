@@ -1,9 +1,14 @@
-There are  161  AWS resources in c7n v0.8.46.1
-There are  171  AWS resources in c7n v0.9.1
+
+Total AWS resources in c7n v0.8.46.1:   160
+Total AWS resources in c7n v0.9.1:   170
+Total New Actions:  93
+Total New Filters:  26
+
 
 👉👉 **ANY ITEMS WITH 🌟 NEXT TO THEM ARE NEW SINCE LAST RELEASE**
 
-New AWS Resources Added between two schemas:
+
+New Resources Added between two schemas:
 
 🌟  backup-vault
 🌟  elasticache-group
@@ -16,7 +21,7 @@ New AWS Resources Added between two schemas:
 🌟  glue-workflow
 🌟  qldb
 
-Cloud Custodian AWS Quick Reference
+
 
 
 aws.account:
@@ -264,8 +269,8 @@ aws.backup-plan:
 
  🌟 #############    NEW RESOURCE  -  aws.backup-vault     #############
 
-🌟 backup-vault:
-    actions:
+ backup-vault:
+     actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - invoke-lambda
@@ -278,14 +283,13 @@ aws.backup-plan:
 🌟   - remove-tag
 🌟   - tag
 🌟   - webhook
-    filters:
+     filters:
 🌟   - event
 🌟   - finding
 🌟   - kms-key
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
-
 
 aws.batch-compute:
   actions:
@@ -1267,7 +1271,7 @@ aws.elastic-ip:
 
  🌟 #############    NEW RESOURCE  -  aws.elasticache-group     #############
 
-🌟 elasticache-group:
+ elasticache-group:
      actions:
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1282,7 +1286,6 @@ aws.elastic-ip:
 🌟   - metrics
 🌟   - ops-item
 🌟   - value
-
 
 aws.elasticbeanstalk:
   actions:
@@ -1409,18 +1412,18 @@ aws.emr:
     - terminate
     - webhook
   filters:
-🌟  - value
     - event
     - finding
     - health-event
     - marked-for-op
     - metrics
     - ops-item
+    - value
 
  🌟 #############    NEW RESOURCE  -  aws.emr-security-configuration     #############
 
-🌟 emr-security-configuration:
-    actions:
+ emr-security-configuration:
+     actions:
 🌟   - delete
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1434,7 +1437,6 @@ aws.emr:
 🌟   - finding
 🌟   - ops-item
 🌟   - value
-
 
 aws.eni:
   actions:
@@ -1629,7 +1631,7 @@ aws.glacier:
 
  🌟 #############    NEW RESOURCE  -  aws.glue-catalog     #############
 
-🌟 glue-catalog:
+ glue-catalog:
      actions:
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1647,10 +1649,9 @@ aws.glacier:
 🌟   - ops-item
 🌟   - value
 
-
  🌟 #############    NEW RESOURCE  -  aws.glue-classifier     #############
 
-🌟 glue-classifier:
+ glue-classifier:
      actions:
 🌟   - delete
 🌟   - invoke-lambda
@@ -1665,7 +1666,6 @@ aws.glacier:
 🌟   - finding
 🌟   - ops-item
 🌟   - value
-
 
 aws.glue-connection:
   actions:
@@ -1776,7 +1776,7 @@ aws.glue-job:
 
  🌟 #############    NEW RESOURCE  -  aws.glue-ml-transform     #############
 
-🌟 glue-ml-transform:
+ glue-ml-transform:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -1798,10 +1798,9 @@ aws.glue-job:
 🌟   - ops-item
 🌟   - value
 
-
  🌟 #############    NEW RESOURCE  -  aws.glue-security-configuration     #############
 
-🌟 glue-security-configuration:
+ glue-security-configuration:
      actions:
 🌟   - delete
 🌟   - invoke-lambda
@@ -1816,7 +1815,6 @@ aws.glue-job:
 🌟   - finding
 🌟   - ops-item
 🌟   - value
-
 
 aws.glue-table:
   actions:
@@ -1829,15 +1827,15 @@ aws.glue-table:
     - put-metric
     - webhook
   filters:
-🌟  - value
     - event
     - finding
     - ops-item
+    - value
 
  🌟 #############    NEW RESOURCE  -  aws.glue-trigger     #############
 
-🌟 glue-trigger:
-    actions:
+ glue-trigger:
+     actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
 🌟   - delete
@@ -1857,11 +1855,10 @@ aws.glue-table:
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
- 
 
  🌟 #############    NEW RESOURCE  -  aws.glue-workflow     #############
 
-🌟 glue-workflow:
+ glue-workflow:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -1883,7 +1880,6 @@ aws.glue-table:
 🌟   - ops-item
 🌟   - security-config
 🌟   - value
-
 
 aws.health-event:
   actions:
@@ -2664,9 +2660,9 @@ aws.peering-connection:
     - tag-count
     - value
 
-🌟 #############    NEW RESOURCE  -  aws.qldb     #############
+ 🌟 #############    NEW RESOURCE  -  aws.qldb     #############
 
-🌟 qldb:
+ qldb:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -2688,7 +2684,6 @@ aws.peering-connection:
 🌟   - marked-for-op
 🌟   - ops-item
 🌟   - value
-
 
 aws.r53domain:
   actions:
@@ -3926,5 +3921,3 @@ aws.workspaces:
     - ops-item
     - tag-count
     - value
-
-
