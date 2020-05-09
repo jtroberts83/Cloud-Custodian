@@ -2,43 +2,47 @@
 AWS resources in c7n v0.8.46.1:   160
 AWS resources in c7n v0.9.1:   170
 
-New Items:
+⭐ New Items:
     Resources: 10
     Actions:  93
     Filters:  24
     
-Removed Items:
+❌ Removed Items:
     Resources: 0
     Actions:  0
     Filters:  26
 
 
-👉👉 **ANY ITEMS WITH 🌟 NEXT TO THEM ARE NEW SINCE LAST RELEASE**
+
+👉👉 **ANY ITEMS WITH ⭐ NEXT TO THEM ARE NEW SINCE LAST RELEASE**
 👉👉 **ANY ITEMS WITH ❌ NEXT TO THEM ARE REMOVED SINCE LAST RELEASE**
 
 
 
 New Resources Added In New Schema:
 
-🌟  backup-vault
-🌟  elasticache-group
-🌟  emr-security-configuration
-🌟  glue-catalog
-🌟  glue-classifier
-🌟  glue-ml-transform
-🌟  glue-security-configuration
-🌟  glue-trigger
-🌟  glue-workflow
-🌟  qldb
+⭐  backup-vault
+⭐  elasticache-group
+⭐  emr-security-configuration
+⭐  glue-catalog
+⭐  glue-classifier
+⭐  glue-ml-transform
+⭐  glue-security-configuration
+⭐  glue-trigger
+⭐  glue-workflow
+⭐  qldb
 
 
-############################################################################################
-AWS SCHEMA DIFF START
-############################################################################################
+
+#####################################################################################
+AWS SCHEMA DIFF:
+#####################################################################################
+
+
 
 aws.account:
   actions:
-🌟  - set-password-policy
+⭐  - set-password-policy
     - enable-cloudtrail
     - enable-data-events
     - invoke-lambda
@@ -151,7 +155,7 @@ aws.ami:
 
 aws.app-elb:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -195,7 +199,7 @@ aws.app-elb:
 
 aws.app-elb-target-group:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -220,7 +224,7 @@ aws.app-elb-target-group:
 
 aws.asg:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -291,25 +295,25 @@ aws.backup-plan:
 
 backup-vault:
      actions:
-🌟   - auto-tag-user
-🌟   - copy-related-tag
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - mark-for-op
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - remove-tag
-🌟   - tag
-🌟   - webhook
+⭐   - auto-tag-user
+⭐   - copy-related-tag
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - mark-for-op
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - remove-tag
+⭐   - tag
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - kms-key
-🌟   - marked-for-op
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - kms-key
+⭐   - marked-for-op
+⭐   - ops-item
+⭐   - value
 
 
 aws.batch-compute:
@@ -424,7 +428,7 @@ aws.cache-subnet-group:
 
 aws.cfn:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -469,7 +473,7 @@ aws.cloud-directory:
 
 aws.cloudhsm-cluster:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -596,7 +600,7 @@ aws.codepipeline:
 
 aws.config-recorder:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -656,7 +660,7 @@ aws.customer-gateway:
 
 aws.datapipeline:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -680,7 +684,7 @@ aws.datapipeline:
 
 aws.dax:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -708,11 +712,11 @@ aws.dax:
 
 aws.directconnect:
   actions:
-🌟  - auto-tag-user
-🌟  - copy-related-tag
-🌟  - mark-for-op
-🌟  - remove-tag
-🌟  - tag
+⭐  - auto-tag-user
+⭐  - copy-related-tag
+⭐  - mark-for-op
+⭐  - remove-tag
+⭐  - tag
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -721,7 +725,7 @@ aws.directconnect:
     - put-metric
     - webhook
   filters:
-🌟  - marked-for-op
+⭐  - marked-for-op
     - event
     - finding
     - health-event
@@ -731,7 +735,7 @@ aws.directconnect:
 
 aws.directory:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -755,7 +759,7 @@ aws.directory:
 
 aws.distribution:
   actions:
-🌟  - set-attributes
+⭐  - set-attributes
     - auto-tag-user
     - copy-related-tag
     - disable
@@ -773,7 +777,7 @@ aws.distribution:
     - tag
     - webhook
   filters:
-🌟  - distribution-config
+⭐  - distribution-config
     - config-compliance
     - event
     - finding
@@ -790,7 +794,7 @@ aws.distribution:
 
 aws.dlm-policy:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -806,11 +810,11 @@ aws.dlm-policy:
 
 aws.dms-endpoint:
   actions:
-🌟  - auto-tag-user
-🌟  - copy-related-tag
-🌟  - mark-for-op
-🌟  - remove-tag
-🌟  - tag
+⭐  - auto-tag-user
+⭐  - copy-related-tag
+⭐  - mark-for-op
+⭐  - remove-tag
+⭐  - tag
     - delete
     - invoke-lambda
     - invoke-sfn
@@ -821,7 +825,7 @@ aws.dms-endpoint:
     - put-metric
     - webhook
   filters:
-🌟  - marked-for-op
+⭐  - marked-for-op
     - event
     - finding
     - ops-item
@@ -830,7 +834,7 @@ aws.dms-endpoint:
 
 aws.dms-instance:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -1021,7 +1025,7 @@ aws.ec2:
     - terminate
     - webhook
   filters:
-🌟  - ssm-compliance
+⭐  - ssm-compliance
     - check-permissions
     - config-compliance
     - default-vpc
@@ -1081,7 +1085,7 @@ aws.ec2-reserved:
 
 aws.ecr:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -1109,7 +1113,7 @@ aws.ecr:
 
 aws.ecs:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -1132,7 +1136,7 @@ aws.ecs:
 
 aws.ecs-container-instance:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -1157,7 +1161,7 @@ aws.ecs-container-instance:
 
 aws.ecs-service:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -1184,7 +1188,7 @@ aws.ecs-service:
 
 aws.ecs-task:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -1209,7 +1213,7 @@ aws.ecs-task:
 
 aws.ecs-task-definition:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -1232,7 +1236,7 @@ aws.ecs-task-definition:
 
 aws.efs:
   actions:
-🌟  - configure-lifecycle-policy
+⭐  - configure-lifecycle-policy
     - auto-tag-user
     - copy-related-tag
     - delete
@@ -1247,7 +1251,7 @@ aws.efs:
     - tag
     - webhook
   filters:
-🌟  - lifecycle-policy
+⭐  - lifecycle-policy
     - event
     - finding
     - health-event
@@ -1261,7 +1265,7 @@ aws.efs:
 
 aws.efs-mount-target:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -1279,7 +1283,7 @@ aws.efs-mount-target:
 
 aws.eks:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -1339,19 +1343,19 @@ aws.elastic-ip:
 
 elasticache-group:
      actions:
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - webhook
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - metrics
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - metrics
+⭐   - ops-item
+⭐   - value
 
 
 aws.elasticbeanstalk:
@@ -1372,7 +1376,7 @@ aws.elasticbeanstalk:
 
 aws.elasticbeanstalk-environment:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -1396,7 +1400,7 @@ aws.elasticbeanstalk-environment:
 
 aws.elasticsearch:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -1424,7 +1428,7 @@ aws.elasticsearch:
 
 aws.elb:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - disable-s3-logging
@@ -1469,7 +1473,7 @@ aws.elb:
 
 aws.emr:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -1496,19 +1500,19 @@ aws.emr:
 
 emr-security-configuration:
      actions:
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - webhook
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - ops-item
+⭐   - value
 
 
 aws.eni:
@@ -1566,7 +1570,7 @@ aws.event-rule:
 
 aws.event-rule-target:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - delete
     - invoke-lambda
     - invoke-sfn
@@ -1609,7 +1613,7 @@ aws.firehose:
 
 aws.fsx:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - backup
     - delete
@@ -1635,7 +1639,7 @@ aws.fsx:
 
 aws.fsx-backup:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -1659,7 +1663,7 @@ aws.fsx-backup:
 
 aws.gamelift-build:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -1718,40 +1722,40 @@ aws.glacier:
 
 glue-catalog:
      actions:
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - set-encryption
-🌟   - webhook
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - set-encryption
+⭐   - webhook
      filters:
-🌟   - cross-account
-🌟   - event
-🌟   - finding
-🌟   - glue-security-config
-🌟   - ops-item
-🌟   - value
+⭐   - cross-account
+⭐   - event
+⭐   - finding
+⭐   - glue-security-config
+⭐   - ops-item
+⭐   - value
 
 
  ✅ #############    NEW AWS RESOURCE  -  aws.glue-classifier   ############# ✅
 
 glue-classifier:
      actions:
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - webhook
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - ops-item
+⭐   - value
 
 
 aws.glue-connection:
@@ -1789,7 +1793,7 @@ aws.glue-crawler:
     - tag
     - webhook
   filters:
-🌟  - security-config
+⭐  - security-config
     - event
     - finding
     - marked-for-op
@@ -1831,8 +1835,8 @@ aws.glue-dev-endpoint:
     - tag
     - webhook
   filters:
-🌟  - security-config
-🌟  - subnet
+⭐  - security-config
+⭐  - subnet
     - event
     - finding
     - marked-for-op
@@ -1857,7 +1861,7 @@ aws.glue-job:
     - tag
     - webhook
   filters:
-🌟  - security-config
+⭐  - security-config
     - event
     - finding
     - marked-for-op
@@ -1870,44 +1874,44 @@ aws.glue-job:
 
 glue-ml-transform:
      actions:
-🌟   - auto-tag-user
-🌟   - copy-related-tag
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - mark-for-op
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - remove-tag
-🌟   - tag
-🌟   - webhook
+⭐   - auto-tag-user
+⭐   - copy-related-tag
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - mark-for-op
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - remove-tag
+⭐   - tag
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - marked-for-op
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - marked-for-op
+⭐   - ops-item
+⭐   - value
 
 
  ✅ #############    NEW AWS RESOURCE  -  aws.glue-security-configuration   ############# ✅
 
 glue-security-configuration:
      actions:
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - webhook
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - ops-item
+⭐   - value
 
 
 aws.glue-table:
@@ -1931,51 +1935,51 @@ aws.glue-table:
 
 glue-trigger:
      actions:
-🌟   - auto-tag-user
-🌟   - copy-related-tag
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - mark-for-op
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - remove-tag
-🌟   - tag
-🌟   - webhook
+⭐   - auto-tag-user
+⭐   - copy-related-tag
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - mark-for-op
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - remove-tag
+⭐   - tag
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - marked-for-op
-🌟   - ops-item
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - marked-for-op
+⭐   - ops-item
+⭐   - value
 
 
  ✅ #############    NEW AWS RESOURCE  -  aws.glue-workflow   ############# ✅
 
 glue-workflow:
      actions:
-🌟   - auto-tag-user
-🌟   - copy-related-tag
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - mark-for-op
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - remove-tag
-🌟   - tag
-🌟   - webhook
+⭐   - auto-tag-user
+⭐   - copy-related-tag
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - mark-for-op
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - remove-tag
+⭐   - tag
+⭐   - webhook
      filters:
-🌟   - event
-🌟   - finding
-🌟   - marked-for-op
-🌟   - ops-item
-🌟   - security-config
-🌟   - value
+⭐   - event
+⭐   - finding
+⭐   - marked-for-op
+⭐   - ops-item
+⭐   - security-config
+⭐   - value
 
 
 aws.health-event:
@@ -2172,8 +2176,8 @@ aws.iam-profile:
 
 aws.iam-role:
   actions:
-🌟  - copy-related-tag
-🌟  - set-boundary
+⭐  - copy-related-tag
+⭐  - set-boundary
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -2204,8 +2208,8 @@ aws.iam-role:
 
 aws.iam-user:
   actions:
-🌟  - copy-related-tag
-🌟  - set-boundary
+⭐  - copy-related-tag
+⭐  - set-boundary
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -2256,7 +2260,7 @@ aws.identity-pool:
 
 aws.internet-gateway:
   actions:
-🌟  - delete
+⭐  - delete
     - auto-tag-user
     - copy-related-tag
     - invoke-lambda
@@ -2301,12 +2305,12 @@ aws.iot:
 
 aws.kafka:
   actions:
-🌟  - auto-tag-user
-🌟  - copy-related-tag
-🌟  - mark-for-op
-🌟  - remove-tag
-🌟  - set-monitoring
-🌟  - tag
+⭐  - auto-tag-user
+⭐  - copy-related-tag
+⭐  - mark-for-op
+⭐  - remove-tag
+⭐  - set-monitoring
+⭐  - tag
     - delete
     - invoke-lambda
     - invoke-sfn
@@ -2316,7 +2320,7 @@ aws.kafka:
     - put-metric
     - webhook
   filters:
-🌟  - marked-for-op
+⭐  - marked-for-op
     - event
     - finding
     - ops-item
@@ -2455,7 +2459,7 @@ aws.lambda:
     - tag
     - webhook
   filters:
-🌟  - kms-key
+⭐  - kms-key
     - check-permissions
     - config-compliance
     - cross-account
@@ -2617,7 +2621,7 @@ aws.log-group:
 
 aws.message-broker:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -2800,31 +2804,31 @@ aws.peering-connection:
 
 qldb:
      actions:
-🌟   - auto-tag-user
-🌟   - copy-related-tag
-🌟   - delete
-🌟   - invoke-lambda
-🌟   - invoke-sfn
-🌟   - mark-for-op
-🌟   - notify
-🌟   - post-finding
-🌟   - post-item
-🌟   - put-metric
-🌟   - remove-tag
-🌟   - tag
-🌟   - webhook
+⭐   - auto-tag-user
+⭐   - copy-related-tag
+⭐   - delete
+⭐   - invoke-lambda
+⭐   - invoke-sfn
+⭐   - mark-for-op
+⭐   - notify
+⭐   - post-finding
+⭐   - post-item
+⭐   - put-metric
+⭐   - remove-tag
+⭐   - tag
+⭐   - webhook
      filters:
-🌟   - config-compliance
-🌟   - event
-🌟   - finding
-🌟   - marked-for-op
-🌟   - ops-item
-🌟   - value
+⭐   - config-compliance
+⭐   - event
+⭐   - finding
+⭐   - marked-for-op
+⭐   - ops-item
+⭐   - value
 
 
 aws.r53domain:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -2957,8 +2961,8 @@ aws.rds-cluster-snapshot:
     - put-metric
     - webhook
   filters:
-🌟  - config-compliance
-🌟  - cross-account
+⭐  - config-compliance
+⭐  - cross-account
     - age
     - event
     - finding
@@ -3070,9 +3074,9 @@ aws.rds-subscription:
 
 aws.redshift:
   actions:
-🌟  - copy-related-tag
-🌟  - pause
-🌟  - resume
+⭐  - copy-related-tag
+⭐  - pause
+⭐  - resume
     - auto-tag-user
     - delete
     - enable-vpc-routing
@@ -3093,8 +3097,8 @@ aws.redshift:
     - tag-trim
     - webhook
   filters:
-🌟  - offhour
-🌟  - onhour
+⭐  - offhour
+⭐  - onhour
     - config-compliance
     - default-vpc
     - event
@@ -3158,7 +3162,7 @@ aws.redshift-subnet-group:
 
 aws.rest-account:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3202,7 +3206,7 @@ aws.rest-api:
 
 aws.rest-resource:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - delete-integration
     - invoke-lambda
     - invoke-sfn
@@ -3249,7 +3253,7 @@ aws.rest-stage:
 
 aws.rest-vpclink:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3281,7 +3285,9 @@ aws.route-table:
     - tag-trim
     - webhook
   filters:
-🌟  - vpc
+⭐  - value
+⭐  - vpc
+❌  - value
     - event
     - finding
     - marked-for-op
@@ -3289,7 +3295,6 @@ aws.route-table:
     - route
     - subnet
     - tag-count
-    - value
 
 
 aws.rrset:
@@ -3310,9 +3315,9 @@ aws.rrset:
 
 aws.s3:
   actions:
-🌟  - copy-related-tag
-🌟  - set-public-block
-🌟  - set-replication
+⭐  - copy-related-tag
+⭐  - set-public-block
+⭐  - set-replication
     - attach-encrypt
     - auto-tag-user
     - configure-lifecycle
@@ -3340,8 +3345,8 @@ aws.s3:
     - toggle-versioning
     - webhook
   filters:
-🌟  - bucket-logging
-🌟  - check-public-block
+⭐  - bucket-logging
+⭐  - check-public-block
     - bucket-encryption
     - bucket-notification
     - config-compliance
@@ -3363,7 +3368,7 @@ aws.s3:
 
 aws.sagemaker-endpoint:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -3386,7 +3391,7 @@ aws.sagemaker-endpoint:
 
 aws.sagemaker-endpoint-config:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -3400,7 +3405,7 @@ aws.sagemaker-endpoint-config:
     - tag
     - webhook
   filters:
-🌟  - kms-key
+⭐  - kms-key
     - event
     - finding
     - marked-for-op
@@ -3410,7 +3415,7 @@ aws.sagemaker-endpoint-config:
 
 aws.sagemaker-job:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -3431,7 +3436,7 @@ aws.sagemaker-job:
 
 aws.sagemaker-model:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -3454,7 +3459,7 @@ aws.sagemaker-model:
 
 aws.sagemaker-notebook:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -3470,7 +3475,7 @@ aws.sagemaker-notebook:
     - tag
     - webhook
   filters:
-🌟  - kms-key
+⭐  - kms-key
     - event
     - finding
     - marked-for-op
@@ -3482,7 +3487,7 @@ aws.sagemaker-notebook:
 
 aws.sagemaker-transform-job:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -3503,7 +3508,7 @@ aws.sagemaker-transform-job:
 
 aws.secrets-manager:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -3526,7 +3531,7 @@ aws.secrets-manager:
 
 aws.security-group:
   actions:
-🌟  - set-permissions
+⭐  - set-permissions
     - auto-tag-user
     - copy-related-tag
     - delete
@@ -3565,7 +3570,7 @@ aws.security-group:
 
 aws.shield-attack:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3581,7 +3586,7 @@ aws.shield-attack:
 
 aws.shield-protection:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3614,7 +3619,7 @@ aws.simpledb:
 
 aws.snowball:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3630,7 +3635,7 @@ aws.snowball:
 
 aws.snowball-cluster:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3646,7 +3651,7 @@ aws.snowball-cluster:
 
 aws.sns:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - delete
     - invoke-lambda
@@ -3675,7 +3680,7 @@ aws.sns:
 
 aws.sqs:
   actions:
-🌟  - modify-policy
+⭐  - modify-policy
     - auto-tag-user
     - copy-related-tag
     - delete
@@ -3705,7 +3710,7 @@ aws.sqs:
 
 aws.ssm-activation:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - delete
     - invoke-lambda
     - invoke-sfn
@@ -3762,7 +3767,7 @@ aws.ssm-parameter:
 
 aws.step-machine:
   actions:
-🌟  - copy-related-tag
+⭐  - copy-related-tag
     - auto-tag-user
     - invoke-lambda
     - invoke-sfn
@@ -3842,9 +3847,10 @@ aws.subnet:
     - tag-trim
     - webhook
   filters:
-🌟  - vpc
+⭐  - value
+⭐  - vpc
 ❌  - json-diff
-    - value
+❌  - value
     - config-compliance
     - event
     - finding
@@ -3856,7 +3862,7 @@ aws.subnet:
 
 aws.support-case:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3872,7 +3878,7 @@ aws.support-case:
 
 aws.transit-attachment:
   actions:
-🌟  - post-finding
+⭐  - post-finding
     - auto-tag-user
     - copy-related-tag
     - invoke-lambda
@@ -3977,14 +3983,14 @@ aws.vpc:
 
 aws.vpc-endpoint:
   actions:
-🌟  - auto-tag-user
-🌟  - copy-related-tag
-🌟  - mark-for-op
-🌟  - normalize-tag
-🌟  - remove-tag
-🌟  - rename-tag
-🌟  - tag
-🌟  - tag-trim
+⭐  - auto-tag-user
+⭐  - copy-related-tag
+⭐  - mark-for-op
+⭐  - normalize-tag
+⭐  - remove-tag
+⭐  - rename-tag
+⭐  - tag
+⭐  - tag-trim
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -3993,8 +3999,8 @@ aws.vpc-endpoint:
     - put-metric
     - webhook
   filters:
-🌟  - marked-for-op
-🌟  - tag-count
+⭐  - marked-for-op
+⭐  - tag-count
     - cross-account
     - event
     - finding
@@ -4082,11 +4088,11 @@ aws.waf:
 
 aws.waf-regional:
   actions:
-🌟  - auto-tag-user
-🌟  - copy-related-tag
-🌟  - mark-for-op
-🌟  - remove-tag
-🌟  - tag
+⭐  - auto-tag-user
+⭐  - copy-related-tag
+⭐  - mark-for-op
+⭐  - remove-tag
+⭐  - tag
     - invoke-lambda
     - invoke-sfn
     - notify
@@ -4095,7 +4101,7 @@ aws.waf-regional:
     - put-metric
     - webhook
   filters:
-🌟  - marked-for-op
+⭐  - marked-for-op
 ❌  - json-diff
     - config-compliance
     - event
@@ -4128,4 +4134,3 @@ aws.workspaces:
     - ops-item
     - tag-count
     - value
-
