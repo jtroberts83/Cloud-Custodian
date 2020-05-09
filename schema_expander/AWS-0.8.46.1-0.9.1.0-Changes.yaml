@@ -1,14 +1,24 @@
 
-Total AWS resources in c7n v0.8.46.1:   160
-Total AWS resources in c7n v0.9.1:   170
-Total New Actions:  93
-Total New Filters:  26
+AWS resources in c7n v0.8.46.1:   160
+AWS resources in c7n v0.9.1:   170
+
+New Items:
+    Resources: 10
+    Actions:  93
+    Filters:  26
+    
+Removed Items:
+    Resources: 0
+    Actions:  0
+    Filters:  28
 
 
 👉👉 **ANY ITEMS WITH 🌟 NEXT TO THEM ARE NEW SINCE LAST RELEASE**
+👉👉 **ANY ITEMS WITH ❌ NEXT TO THEM ARE REMOVED SINCE LAST RELEASE**
 
 
-New Resources Added between two schemas:
+
+New Resources Added In New Schema:
 
 🌟  backup-vault
 🌟  elasticache-group
@@ -22,7 +32,9 @@ New Resources Added between two schemas:
 🌟  qldb
 
 
-
+############################################################################################
+AWS SCHEMA DIFF START
+############################################################################################
 
 aws.account:
   actions:
@@ -61,6 +73,7 @@ aws.account:
     - value
     - xray-encrypt-key
 
+
 aws.acm-certificate:
   actions:
     - auto-tag-user
@@ -85,6 +98,7 @@ aws.acm-certificate:
     - ops-item
     - value
 
+
 aws.alarm:
   actions:
     - delete
@@ -101,6 +115,7 @@ aws.alarm:
     - finding
     - ops-item
     - value
+
 
 aws.ami:
   actions:
@@ -132,6 +147,7 @@ aws.ami:
     - tag-count
     - unused
     - value
+
 
 aws.app-elb:
   actions:
@@ -176,6 +192,7 @@ aws.app-elb:
     - vpc
     - waf-enabled
 
+
 aws.app-elb-target-group:
   actions:
 🌟  - copy-related-tag
@@ -199,6 +216,7 @@ aws.app-elb-target-group:
     - ops-item
     - tag-count
     - value
+
 
 aws.asg:
   actions:
@@ -246,6 +264,7 @@ aws.asg:
     - value
     - vpc-id
 
+
 aws.backup-plan:
   actions:
     - auto-tag-user
@@ -267,9 +286,10 @@ aws.backup-plan:
     - ops-item
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.backup-vault   ############# ✅
 
- backup-vault:
+ ✅ #############    NEW AWS RESOURCE  -  aws.backup-vault   ############# ✅
+
+backup-vault:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -291,6 +311,7 @@ aws.backup-plan:
 🌟   - ops-item
 🌟   - value
 
+
 aws.batch-compute:
   actions:
     - delete
@@ -310,6 +331,7 @@ aws.batch-compute:
     - subnet
     - value
 
+
 aws.batch-definition:
   actions:
     - deregister
@@ -325,6 +347,7 @@ aws.batch-definition:
     - finding
     - ops-item
     - value
+
 
 aws.cache-cluster:
   actions:
@@ -356,6 +379,7 @@ aws.cache-cluster:
     - tag-count
     - value
 
+
 aws.cache-snapshot:
   actions:
     - auto-tag-user
@@ -381,6 +405,7 @@ aws.cache-snapshot:
     - tag-count
     - value
 
+
 aws.cache-subnet-group:
   actions:
     - invoke-lambda
@@ -395,6 +420,7 @@ aws.cache-subnet-group:
     - finding
     - ops-item
     - value
+
 
 aws.cfn:
   actions:
@@ -418,6 +444,7 @@ aws.cfn:
     - ops-item
     - value
 
+
 aws.cloud-directory:
   actions:
     - auto-tag-user
@@ -439,6 +466,7 @@ aws.cloud-directory:
     - ops-item
     - value
 
+
 aws.cloudhsm-cluster:
   actions:
 🌟  - copy-related-tag
@@ -458,6 +486,7 @@ aws.cloudhsm-cluster:
     - ops-item
     - value
 
+
 aws.cloudsearch:
   actions:
     - delete
@@ -474,6 +503,7 @@ aws.cloudsearch:
     - metrics
     - ops-item
     - value
+
 
 aws.cloudtrail:
   actions:
@@ -502,6 +532,7 @@ aws.cloudtrail:
     - status
     - value
 
+
 aws.codebuild:
   actions:
     - auto-tag-user
@@ -529,6 +560,7 @@ aws.codebuild:
     - value
     - vpc
 
+
 aws.codecommit:
   actions:
     - delete
@@ -545,6 +577,7 @@ aws.codecommit:
     - ops-item
     - value
 
+
 aws.codepipeline:
   actions:
     - invoke-lambda
@@ -560,6 +593,7 @@ aws.codepipeline:
     - ops-item
     - value
 
+
 aws.config-recorder:
   actions:
 🌟  - post-finding
@@ -570,9 +604,11 @@ aws.config-recorder:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.config-rule:
   actions:
@@ -590,6 +626,7 @@ aws.config-rule:
     - ops-item
     - status
     - value
+
 
 aws.customer-gateway:
   actions:
@@ -616,6 +653,7 @@ aws.customer-gateway:
     - tag-count
     - value
 
+
 aws.datapipeline:
   actions:
 🌟  - copy-related-tag
@@ -638,6 +676,7 @@ aws.datapipeline:
     - metrics
     - ops-item
     - value
+
 
 aws.dax:
   actions:
@@ -666,6 +705,7 @@ aws.dax:
     - subnet
     - value
 
+
 aws.directconnect:
   actions:
 🌟  - auto-tag-user
@@ -687,6 +727,7 @@ aws.directconnect:
     - health-event
     - ops-item
     - value
+
 
 aws.directory:
   actions:
@@ -710,6 +751,7 @@ aws.directory:
     - subnet
     - value
     - vpc
+
 
 aws.distribution:
   actions:
@@ -745,6 +787,7 @@ aws.distribution:
     - value
     - waf-enabled
 
+
 aws.dlm-policy:
   actions:
 🌟  - post-finding
@@ -755,9 +798,11 @@ aws.dlm-policy:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.dms-endpoint:
   actions:
@@ -781,6 +826,7 @@ aws.dms-endpoint:
     - finding
     - ops-item
     - value
+
 
 aws.dms-instance:
   actions:
@@ -810,6 +856,7 @@ aws.dms-instance:
     - value
     - vpc
 
+
 aws.dynamodb-backup:
   actions:
     - delete
@@ -826,6 +873,7 @@ aws.dynamodb-backup:
     - ops-item
     - value
 
+
 aws.dynamodb-stream:
   actions:
     - invoke-lambda
@@ -841,6 +889,7 @@ aws.dynamodb-stream:
     - metrics
     - ops-item
     - value
+
 
 aws.dynamodb-table:
   actions:
@@ -869,6 +918,7 @@ aws.dynamodb-table:
     - metrics
     - ops-item
     - value
+
 
 aws.ebs:
   actions:
@@ -908,6 +958,7 @@ aws.ebs:
     - tag-count
     - value
 
+
 aws.ebs-snapshot:
   actions:
     - auto-tag-user
@@ -938,6 +989,7 @@ aws.ebs-snapshot:
     - tag-count
     - unused
     - value
+
 
 aws.ec2:
   actions:
@@ -1000,6 +1052,7 @@ aws.ec2:
     - value
     - vpc
 
+
 aws.ec2-reserved:
   actions:
     - auto-tag-user
@@ -1024,6 +1077,7 @@ aws.ec2-reserved:
     - ops-item
     - tag-count
     - value
+
 
 aws.ecr:
   actions:
@@ -1052,6 +1106,7 @@ aws.ecr:
     - ops-item
     - value
 
+
 aws.ecs:
   actions:
 🌟  - copy-related-tag
@@ -1073,6 +1128,7 @@ aws.ecs:
     - metrics
     - ops-item
     - value
+
 
 aws.ecs-container-instance:
   actions:
@@ -1097,6 +1153,7 @@ aws.ecs-container-instance:
     - ops-item
     - taggable
     - value
+
 
 aws.ecs-service:
   actions:
@@ -1124,6 +1181,7 @@ aws.ecs-service:
     - task-definition
     - value
 
+
 aws.ecs-task:
   actions:
 🌟  - copy-related-tag
@@ -1148,6 +1206,7 @@ aws.ecs-task:
     - task-definition
     - value
 
+
 aws.ecs-task-definition:
   actions:
 🌟  - copy-related-tag
@@ -1169,6 +1228,7 @@ aws.ecs-task-definition:
     - marked-for-op
     - ops-item
     - value
+
 
 aws.efs:
   actions:
@@ -1198,6 +1258,7 @@ aws.efs:
     - tag-count
     - value
 
+
 aws.efs-mount-target:
   actions:
 🌟  - post-finding
@@ -1208,11 +1269,13 @@ aws.efs-mount-target:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - security-group
     - subnet
     - value
+
 
 aws.eks:
   actions:
@@ -1240,6 +1303,7 @@ aws.eks:
     - value
     - vpc
 
+
 aws.elastic-ip:
   actions:
     - auto-tag-user
@@ -1260,6 +1324,7 @@ aws.elastic-ip:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
@@ -1269,9 +1334,10 @@ aws.elastic-ip:
     - tag-count
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.elasticache-group   ############# ✅
 
- elasticache-group:
+ ✅ #############    NEW AWS RESOURCE  -  aws.elasticache-group   ############# ✅
+
+elasticache-group:
      actions:
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1287,6 +1353,7 @@ aws.elastic-ip:
 🌟   - ops-item
 🌟   - value
 
+
 aws.elasticbeanstalk:
   actions:
     - invoke-lambda
@@ -1301,6 +1368,7 @@ aws.elasticbeanstalk:
     - finding
     - ops-item
     - value
+
 
 aws.elasticbeanstalk-environment:
   actions:
@@ -1324,6 +1392,7 @@ aws.elasticbeanstalk-environment:
     - ops-item
     - tag-count
     - value
+
 
 aws.elasticsearch:
   actions:
@@ -1351,6 +1420,7 @@ aws.elasticsearch:
     - subnet
     - value
     - vpc
+
 
 aws.elb:
   actions:
@@ -1396,6 +1466,7 @@ aws.elb:
     - value
     - vpc
 
+
 aws.emr:
   actions:
 🌟  - copy-related-tag
@@ -1420,9 +1491,10 @@ aws.emr:
     - ops-item
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.emr-security-configuration   ############# ✅
 
- emr-security-configuration:
+ ✅ #############    NEW AWS RESOURCE  -  aws.emr-security-configuration   ############# ✅
+
+emr-security-configuration:
      actions:
 🌟   - delete
 🌟   - invoke-lambda
@@ -1437,6 +1509,7 @@ aws.emr:
 🌟   - finding
 🌟   - ops-item
 🌟   - value
+
 
 aws.eni:
   actions:
@@ -1459,6 +1532,7 @@ aws.eni:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
@@ -1471,6 +1545,7 @@ aws.eni:
     - tag-count
     - value
     - vpc
+
 
 aws.event-rule:
   actions:
@@ -1488,6 +1563,7 @@ aws.event-rule:
     - ops-item
     - value
 
+
 aws.event-rule-target:
   actions:
 🌟  - post-finding
@@ -1499,10 +1575,12 @@ aws.event-rule-target:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - cross-account
     - event
     - ops-item
     - value
+
 
 aws.firehose:
   actions:
@@ -1527,6 +1605,7 @@ aws.firehose:
     - metrics
     - ops-item
     - value
+
 
 aws.fsx:
   actions:
@@ -1553,6 +1632,7 @@ aws.fsx:
     - ops-item
     - value
 
+
 aws.fsx-backup:
   actions:
 🌟  - copy-related-tag
@@ -1576,6 +1656,7 @@ aws.fsx-backup:
     - ops-item
     - value
 
+
 aws.gamelift-build:
   actions:
 🌟  - post-finding
@@ -1586,9 +1667,11 @@ aws.gamelift-build:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.gamelift-fleet:
   actions:
@@ -1604,6 +1687,7 @@ aws.gamelift-fleet:
     - finding
     - ops-item
     - value
+
 
 aws.glacier:
   actions:
@@ -1629,9 +1713,10 @@ aws.glacier:
     - tag-count
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.glue-catalog   ############# ✅
 
- glue-catalog:
+ ✅ #############    NEW AWS RESOURCE  -  aws.glue-catalog   ############# ✅
+
+glue-catalog:
      actions:
 🌟   - invoke-lambda
 🌟   - invoke-sfn
@@ -1649,9 +1734,10 @@ aws.glacier:
 🌟   - ops-item
 🌟   - value
 
- ✅ #############    NEW RESOURCE  -  aws.glue-classifier   ############# ✅
 
- glue-classifier:
+ ✅ #############    NEW AWS RESOURCE  -  aws.glue-classifier   ############# ✅
+
+glue-classifier:
      actions:
 🌟   - delete
 🌟   - invoke-lambda
@@ -1666,6 +1752,7 @@ aws.glacier:
 🌟   - finding
 🌟   - ops-item
 🌟   - value
+
 
 aws.glue-connection:
   actions:
@@ -1684,6 +1771,7 @@ aws.glue-connection:
     - security-group
     - subnet
     - value
+
 
 aws.glue-crawler:
   actions:
@@ -1709,6 +1797,7 @@ aws.glue-crawler:
     - tag-count
     - value
 
+
 aws.glue-database:
   actions:
     - delete
@@ -1724,6 +1813,7 @@ aws.glue-database:
     - finding
     - ops-item
     - value
+
 
 aws.glue-dev-endpoint:
   actions:
@@ -1750,6 +1840,7 @@ aws.glue-dev-endpoint:
     - tag-count
     - value
 
+
 aws.glue-job:
   actions:
     - auto-tag-user
@@ -1774,9 +1865,10 @@ aws.glue-job:
     - tag-count
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.glue-ml-transform   ############# ✅
 
- glue-ml-transform:
+ ✅ #############    NEW AWS RESOURCE  -  aws.glue-ml-transform   ############# ✅
+
+glue-ml-transform:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -1798,9 +1890,10 @@ aws.glue-job:
 🌟   - ops-item
 🌟   - value
 
- ✅ #############    NEW RESOURCE  -  aws.glue-security-configuration   ############# ✅
 
- glue-security-configuration:
+ ✅ #############    NEW AWS RESOURCE  -  aws.glue-security-configuration   ############# ✅
+
+glue-security-configuration:
      actions:
 🌟   - delete
 🌟   - invoke-lambda
@@ -1815,6 +1908,7 @@ aws.glue-job:
 🌟   - finding
 🌟   - ops-item
 🌟   - value
+
 
 aws.glue-table:
   actions:
@@ -1832,9 +1926,10 @@ aws.glue-table:
     - ops-item
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.glue-trigger   ############# ✅
 
- glue-trigger:
+ ✅ #############    NEW AWS RESOURCE  -  aws.glue-trigger   ############# ✅
+
+glue-trigger:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -1856,9 +1951,10 @@ aws.glue-table:
 🌟   - ops-item
 🌟   - value
 
- ✅ #############    NEW RESOURCE  -  aws.glue-workflow   ############# ✅
 
- glue-workflow:
+ ✅ #############    NEW AWS RESOURCE  -  aws.glue-workflow   ############# ✅
+
+glue-workflow:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -1881,6 +1977,7 @@ aws.glue-table:
 🌟   - security-config
 🌟   - value
 
+
 aws.health-event:
   actions:
     - invoke-lambda
@@ -1895,6 +1992,7 @@ aws.health-event:
     - finding
     - ops-item
     - value
+
 
 aws.healthcheck:
   actions:
@@ -1917,6 +2015,7 @@ aws.healthcheck:
     - ops-item
     - tag-count
     - value
+
 
 aws.hostedzone:
   actions:
@@ -1944,6 +2043,7 @@ aws.hostedzone:
     - tag-count
     - value
 
+
 aws.hsm:
   actions:
     - invoke-lambda
@@ -1958,6 +2058,7 @@ aws.hsm:
     - finding
     - ops-item
     - value
+
 
 aws.hsm-client:
   actions:
@@ -1974,6 +2075,7 @@ aws.hsm-client:
     - ops-item
     - value
 
+
 aws.hsm-hapg:
   actions:
     - invoke-lambda
@@ -1989,6 +2091,7 @@ aws.hsm-hapg:
     - ops-item
     - value
 
+
 aws.iam-certificate:
   actions:
     - invoke-lambda
@@ -2003,6 +2106,7 @@ aws.iam-certificate:
     - finding
     - ops-item
     - value
+
 
 aws.iam-group:
   actions:
@@ -2023,6 +2127,7 @@ aws.iam-group:
     - ops-item
     - usage
     - value
+
 
 aws.iam-policy:
   actions:
@@ -2046,6 +2151,7 @@ aws.iam-policy:
     - used
     - value
 
+
 aws.iam-profile:
   actions:
     - invoke-lambda
@@ -2062,6 +2168,7 @@ aws.iam-profile:
     - unused
     - used
     - value
+
 
 aws.iam-role:
   actions:
@@ -2093,6 +2200,7 @@ aws.iam-role:
     - usage
     - used
     - value
+
 
 aws.iam-user:
   actions:
@@ -2128,6 +2236,7 @@ aws.iam-user:
     - usage
     - value
 
+
 aws.identity-pool:
   actions:
     - delete
@@ -2143,6 +2252,7 @@ aws.identity-pool:
     - finding
     - ops-item
     - value
+
 
 aws.internet-gateway:
   actions:
@@ -2163,6 +2273,7 @@ aws.internet-gateway:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
@@ -2170,6 +2281,7 @@ aws.internet-gateway:
     - ops-item
     - tag-count
     - value
+
 
 aws.iot:
   actions:
@@ -2185,6 +2297,7 @@ aws.iot:
     - finding
     - ops-item
     - value
+
 
 aws.kafka:
   actions:
@@ -2211,6 +2324,7 @@ aws.kafka:
     - subnet
     - value
 
+
 aws.key-pair:
   actions:
     - invoke-lambda
@@ -2225,6 +2339,7 @@ aws.key-pair:
     - finding
     - ops-item
     - value
+
 
 aws.kinesis:
   actions:
@@ -2251,6 +2366,7 @@ aws.kinesis:
     - tag-count
     - value
 
+
 aws.kinesis-analytics:
   actions:
     - auto-tag-user
@@ -2273,6 +2389,7 @@ aws.kinesis-analytics:
     - ops-item
     - value
 
+
 aws.kms:
   actions:
     - invoke-lambda
@@ -2290,6 +2407,7 @@ aws.kms:
     - grant-count
     - ops-item
     - value
+
 
 aws.kms-key:
   actions:
@@ -2316,6 +2434,7 @@ aws.kms-key:
     - ops-item
     - tag-count
     - value
+
 
 aws.lambda:
   actions:
@@ -2353,6 +2472,7 @@ aws.lambda:
     - value
     - vpc
 
+
 aws.lambda-layer:
   actions:
     - delete
@@ -2370,6 +2490,7 @@ aws.lambda-layer:
     - finding
     - ops-item
     - value
+
 
 aws.launch-config:
   actions:
@@ -2389,6 +2510,7 @@ aws.launch-config:
     - ops-item
     - unused
     - value
+
 
 aws.launch-template-version:
   actions:
@@ -2415,6 +2537,7 @@ aws.launch-template-version:
     - tag-count
     - value
 
+
 aws.lightsail-db:
   actions:
     - invoke-lambda
@@ -2429,6 +2552,7 @@ aws.lightsail-db:
     - finding
     - ops-item
     - value
+
 
 aws.lightsail-elb:
   actions:
@@ -2445,6 +2569,7 @@ aws.lightsail-elb:
     - ops-item
     - value
 
+
 aws.lightsail-instance:
   actions:
     - invoke-lambda
@@ -2459,6 +2584,7 @@ aws.lightsail-instance:
     - finding
     - ops-item
     - value
+
 
 aws.log-group:
   actions:
@@ -2488,6 +2614,7 @@ aws.log-group:
     - tag-count
     - value
 
+
 aws.message-broker:
   actions:
 🌟  - copy-related-tag
@@ -2513,6 +2640,7 @@ aws.message-broker:
     - subnet
     - value
 
+
 aws.ml-model:
   actions:
     - delete
@@ -2528,6 +2656,7 @@ aws.ml-model:
     - finding
     - ops-item
     - value
+
 
 aws.nat-gateway:
   actions:
@@ -2555,6 +2684,7 @@ aws.nat-gateway:
     - tag-count
     - value
 
+
 aws.network-acl:
   actions:
     - auto-tag-user
@@ -2573,6 +2703,7 @@ aws.network-acl:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
@@ -2582,6 +2713,7 @@ aws.network-acl:
     - subnet
     - tag-count
     - value
+
 
 aws.ops-item:
   actions:
@@ -2599,6 +2731,7 @@ aws.ops-item:
     - ops-item
     - value
 
+
 aws.opswork-cm:
   actions:
     - delete
@@ -2614,6 +2747,7 @@ aws.opswork-cm:
     - finding
     - ops-item
     - value
+
 
 aws.opswork-stack:
   actions:
@@ -2632,6 +2766,7 @@ aws.opswork-stack:
     - metrics
     - ops-item
     - value
+
 
 aws.peering-connection:
   actions:
@@ -2660,9 +2795,10 @@ aws.peering-connection:
     - tag-count
     - value
 
- ✅ #############    NEW RESOURCE  -  aws.qldb   ############# ✅
 
- qldb:
+ ✅ #############    NEW AWS RESOURCE  -  aws.qldb   ############# ✅
+
+qldb:
      actions:
 🌟   - auto-tag-user
 🌟   - copy-related-tag
@@ -2685,6 +2821,7 @@ aws.peering-connection:
 🌟   - ops-item
 🌟   - value
 
+
 aws.r53domain:
   actions:
 🌟  - copy-related-tag
@@ -2703,6 +2840,7 @@ aws.r53domain:
     - finding
     - ops-item
     - value
+
 
 aws.rds:
   actions:
@@ -2752,6 +2890,7 @@ aws.rds:
     - value
     - vpc
 
+
 aws.rds-cluster:
   actions:
     - auto-tag-user
@@ -2786,6 +2925,7 @@ aws.rds-cluster:
     - tag-count
     - value
 
+
 aws.rds-cluster-param-group:
   actions:
     - copy
@@ -2804,6 +2944,7 @@ aws.rds-cluster-param-group:
     - metrics
     - ops-item
     - value
+
 
 aws.rds-cluster-snapshot:
   actions:
@@ -2824,6 +2965,7 @@ aws.rds-cluster-snapshot:
     - ops-item
     - value
 
+
 aws.rds-param-group:
   actions:
     - copy
@@ -2843,6 +2985,7 @@ aws.rds-param-group:
     - ops-item
     - value
 
+
 aws.rds-reserved:
   actions:
     - invoke-lambda
@@ -2857,6 +3000,7 @@ aws.rds-reserved:
     - finding
     - ops-item
     - value
+
 
 aws.rds-snapshot:
   actions:
@@ -2888,6 +3032,7 @@ aws.rds-snapshot:
     - tag-count
     - value
 
+
 aws.rds-subnet-group:
   actions:
     - delete
@@ -2905,6 +3050,7 @@ aws.rds-subnet-group:
     - unused
     - value
 
+
 aws.rds-subscription:
   actions:
     - invoke-lambda
@@ -2920,6 +3066,7 @@ aws.rds-subscription:
     - finding
     - ops-item
     - value
+
 
 aws.redshift:
   actions:
@@ -2963,6 +3110,7 @@ aws.redshift:
     - subnet
     - value
 
+
 aws.redshift-snapshot:
   actions:
     - auto-tag-user
@@ -2990,6 +3138,7 @@ aws.redshift-snapshot:
     - tag-count
     - value
 
+
 aws.redshift-subnet-group:
   actions:
     - invoke-lambda
@@ -3006,6 +3155,7 @@ aws.redshift-subnet-group:
     - ops-item
     - value
 
+
 aws.rest-account:
   actions:
 🌟  - post-finding
@@ -3017,9 +3167,11 @@ aws.rest-account:
     - update
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.rest-api:
   actions:
@@ -3047,6 +3199,7 @@ aws.rest-api:
     - ops-item
     - value
 
+
 aws.rest-resource:
   actions:
 🌟  - post-finding
@@ -3060,11 +3213,13 @@ aws.rest-resource:
     - update-method
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - rest-integration
     - rest-method
     - value
+
 
 aws.rest-stage:
   actions:
@@ -3091,6 +3246,7 @@ aws.rest-stage:
     - tag-count
     - value
 
+
 aws.rest-vpclink:
   actions:
 🌟  - post-finding
@@ -3101,9 +3257,11 @@ aws.rest-vpclink:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.route-table:
   actions:
@@ -3125,6 +3283,7 @@ aws.route-table:
   filters:
 🌟  - value
 🌟  - vpc
+❌  - value
     - event
     - finding
     - marked-for-op
@@ -3132,6 +3291,7 @@ aws.route-table:
     - route
     - subnet
     - tag-count
+
 
 aws.rrset:
   actions:
@@ -3147,6 +3307,7 @@ aws.rrset:
     - finding
     - ops-item
     - value
+
 
 aws.s3:
   actions:
@@ -3200,6 +3361,7 @@ aws.s3:
     - ops-item
     - value
 
+
 aws.sagemaker-endpoint:
   actions:
 🌟  - copy-related-tag
@@ -3221,6 +3383,7 @@ aws.sagemaker-endpoint:
     - marked-for-op
     - ops-item
     - value
+
 
 aws.sagemaker-endpoint-config:
   actions:
@@ -3245,6 +3408,7 @@ aws.sagemaker-endpoint-config:
     - ops-item
     - value
 
+
 aws.sagemaker-job:
   actions:
 🌟  - copy-related-tag
@@ -3264,6 +3428,7 @@ aws.sagemaker-job:
     - finding
     - ops-item
     - value
+
 
 aws.sagemaker-model:
   actions:
@@ -3286,6 +3451,7 @@ aws.sagemaker-model:
     - marked-for-op
     - ops-item
     - value
+
 
 aws.sagemaker-notebook:
   actions:
@@ -3314,6 +3480,7 @@ aws.sagemaker-notebook:
     - subnet
     - value
 
+
 aws.sagemaker-transform-job:
   actions:
 🌟  - copy-related-tag
@@ -3333,6 +3500,7 @@ aws.sagemaker-transform-job:
     - finding
     - ops-item
     - value
+
 
 aws.secrets-manager:
   actions:
@@ -3356,6 +3524,7 @@ aws.secrets-manager:
     - ops-item
     - value
 
+
 aws.security-group:
   actions:
 🌟  - set-permissions
@@ -3378,6 +3547,7 @@ aws.security-group:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - default-vpc
     - diff
@@ -3393,6 +3563,7 @@ aws.security-group:
     - used
     - value
 
+
 aws.shield-attack:
   actions:
 🌟  - post-finding
@@ -3403,9 +3574,11 @@ aws.shield-attack:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.shield-protection:
   actions:
@@ -3417,9 +3590,11 @@ aws.shield-protection:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.simpledb:
   actions:
@@ -3437,6 +3612,7 @@ aws.simpledb:
     - ops-item
     - value
 
+
 aws.snowball:
   actions:
 🌟  - post-finding
@@ -3447,9 +3623,11 @@ aws.snowball:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.snowball-cluster:
   actions:
@@ -3461,9 +3639,11 @@ aws.snowball-cluster:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.sns:
   actions:
@@ -3492,6 +3672,7 @@ aws.sns:
     - metrics
     - ops-item
     - value
+
 
 aws.sqs:
   actions:
@@ -3522,6 +3703,7 @@ aws.sqs:
     - ops-item
     - value
 
+
 aws.ssm-activation:
   actions:
 🌟  - post-finding
@@ -3533,9 +3715,11 @@ aws.ssm-activation:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.ssm-managed-instance:
   actions:
@@ -3552,6 +3736,7 @@ aws.ssm-managed-instance:
     - finding
     - ops-item
     - value
+
 
 aws.ssm-parameter:
   actions:
@@ -3575,6 +3760,7 @@ aws.ssm-parameter:
     - tag-count
     - value
 
+
 aws.step-machine:
   actions:
 🌟  - copy-related-tag
@@ -3594,6 +3780,7 @@ aws.step-machine:
     - ops-item
     - value
 
+
 aws.storage-gateway:
   actions:
     - invoke-lambda
@@ -3609,6 +3796,7 @@ aws.storage-gateway:
     - health-event
     - ops-item
     - value
+
 
 aws.streaming-distribution:
   actions:
@@ -3635,6 +3823,7 @@ aws.streaming-distribution:
     - tag-count
     - value
 
+
 aws.subnet:
   actions:
     - auto-tag-user
@@ -3656,6 +3845,8 @@ aws.subnet:
   filters:
 🌟  - value
 🌟  - vpc
+❌  - json-diff
+❌  - value
     - config-compliance
     - event
     - finding
@@ -3663,6 +3854,7 @@ aws.subnet:
     - marked-for-op
     - ops-item
     - tag-count
+
 
 aws.support-case:
   actions:
@@ -3674,9 +3866,11 @@ aws.support-case:
     - put-metric
     - webhook
   filters:
+❌  - finding
     - event
     - ops-item
     - value
+
 
 aws.transit-attachment:
   actions:
@@ -3696,11 +3890,13 @@ aws.transit-attachment:
     - tag-trim
     - webhook
   filters:
+❌  - finding
     - event
     - marked-for-op
     - ops-item
     - tag-count
     - value
+
 
 aws.transit-gateway:
   actions:
@@ -3727,6 +3923,7 @@ aws.transit-gateway:
     - tag-count
     - value
 
+
 aws.user-pool:
   actions:
     - delete
@@ -3742,6 +3939,7 @@ aws.user-pool:
     - finding
     - ops-item
     - value
+
 
 aws.vpc:
   actions:
@@ -3762,6 +3960,7 @@ aws.vpc:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - dhcp-options
     - event
@@ -3776,6 +3975,7 @@ aws.vpc:
     - tag-count
     - value
     - vpc-attributes
+
 
 aws.vpc-endpoint:
   actions:
@@ -3806,6 +4006,7 @@ aws.vpc-endpoint:
     - value
     - vpc
 
+
 aws.vpn-connection:
   actions:
     - auto-tag-user
@@ -3824,6 +4025,7 @@ aws.vpn-connection:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
@@ -3831,6 +4033,7 @@ aws.vpn-connection:
     - ops-item
     - tag-count
     - value
+
 
 aws.vpn-gateway:
   actions:
@@ -3850,6 +4053,7 @@ aws.vpn-gateway:
     - tag-trim
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
@@ -3857,6 +4061,7 @@ aws.vpn-gateway:
     - ops-item
     - tag-count
     - value
+
 
 aws.waf:
   actions:
@@ -3868,12 +4073,14 @@ aws.waf:
     - put-metric
     - webhook
   filters:
+❌  - json-diff
     - config-compliance
     - event
     - finding
     - metrics
     - ops-item
     - value
+
 
 aws.waf-regional:
   actions:
@@ -3891,12 +4098,14 @@ aws.waf-regional:
     - webhook
   filters:
 🌟  - marked-for-op
+❌  - json-diff
     - config-compliance
     - event
     - finding
     - metrics
     - ops-item
     - value
+
 
 aws.workspaces:
   actions:
@@ -3921,3 +4130,4 @@ aws.workspaces:
     - ops-item
     - tag-count
     - value
+
