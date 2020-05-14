@@ -34,10 +34,10 @@
     - source: "elasticloadbalancing.amazonaws.com"
       event: CreateListener
       ids: "requestParameters.loadBalancerArn"
-
-    - source: "elasticloadbalancing.amazonaws.com"
+      
+    - source: elasticloadbalancing.amazonaws.com
       event: CreateLoadBalancer
-      ids: "requestParameters.name"
+      ids: "responseElements.loadBalancers[].loadBalancerArn"
 
     - source: "elasticloadbalancing.amazonaws.com"
       event: ModifyListener
@@ -222,10 +222,6 @@
     - source: "elasticloadbalancing.amazonaws.com"
       event: CreateLoadBalancerPolicy
       ids: "requestParameters.loadBalancerName"     
-
-    - source: elasticloadbalancing.amazonaws.com
-      event: CreateLoadBalancer
-      ids: "responseElements.loadBalancers[].loadBalancerArn"
 
     - source: elasticloadbalancing.amazonaws.com
       event: CreateTargetGroup
