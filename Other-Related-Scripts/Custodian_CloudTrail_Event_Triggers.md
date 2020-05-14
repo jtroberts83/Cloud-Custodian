@@ -214,7 +214,7 @@
 
 
 ## **ELB - Elastic Load Balancers (Classic):**
-  events:
+
     - CreateLoadBalancer
 
     - source: "elasticloadbalancing.amazonaws.com"
