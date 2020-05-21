@@ -28,6 +28,7 @@ S3KeyPath='C7N-Generated-Reports'
 mkdir /tmp/c7n
 mkdir /tmp/c7n/policies
 mkdir /tmp/c7n/csvs
+mkdir /tmp/c7n/jsons
 
 
 #Exports the custodian schema to a file called schema_list
@@ -85,27 +86,27 @@ echo "policies:" > CustodianScanAllResourceTypesPolicies.yaml
 for resourceTypeNew in "${resourcesArray[@]}"
 do
     # Get the size of the $resourceTypeNew variable
-	size=${#resourceTypeNew}
+    size=${#resourceTypeNew}
 	
 	
-	# If the size of the resourceTypeNew variable is greater than 1 proceed
+    # If the size of the resourceTypeNew variable is greater than 1 proceed
     if (( size > 1 )); then
 	    
-		# Remove the 'aws.' from in front of the resource (optional)
+	# Remove the 'aws.' from in front of the resource (optional)
         resourceTypeNew=$(echo "$resourceTypeNew" | sed 's/aws\.//g')
 		
-		# Removes any newlines/returns from the resourceTypeNew variable and saves it as $CleanedResourceType
+	# Removes any newlines/returns from the resourceTypeNew variable and saves it as $CleanedResourceType
         CleanedResourceType=${resourceTypeNew//[$'\t\r\n']}
         
-		# Sets a variable '$tempPolicyTemplate' to the contents of 
-		# our $policyTemplate (so we don't overwrite the orginal template)
-		tempPolicyTemplate=$policyTemplate
+	# Sets a variable '$tempPolicyTemplate' to the contents of 
+	# our $policyTemplate (so we don't overwrite the orginal template)
+	tempPolicyTemplate=$policyTemplate
 		
-		# Replace 'RESTYPE' in the $tempPolicyTemplate with the actual resource name
+	# Replace 'RESTYPE' in the $tempPolicyTemplate with the actual resource name
         tempPolicyTemplate=$(echo "$tempPolicyTemplate" | sed "s/RESTYPE/$CleanedResourceType/g")
 		
-		# Write out a blank line/newline followed by the contents of $tempPolicyTemplate followed 
-		# by another blank line/newline to the file followed by another newline CustodianScanAllResourceTypesPolicies.yaml
+	# Write out a blank line/newline followed by the contents of $tempPolicyTemplate followed 
+	# by another blank line/newline to the file followed by another newline CustodianScanAllResourceTypesPolicies.yaml
         echo "" >> CustodianScanAllResourceTypesPolicies.yaml
         echo "$tempPolicyTemplate" >> CustodianScanAllResourceTypesPolicies.yaml
         echo "" >> CustodianScanAllResourceTypesPolicies.yaml
@@ -129,21 +130,26 @@ echo "Done Scanning All Resource Types.  Now creating Reports, please wait this 
 for resourceType in "${resourcesArray[@]}"
 do
     # Get the size of the $resourceTypeNew variable
-	size=${#resourceType}
+    size=${#resourceType}
 	
-	# If the size of the resourceTypeNew variable is greater than 1 proceed (makes sure it's not null)
+    # If the size of the resourceTypeNew variable is greater than 1 proceed (makes sure it's not null)
     if (( size > 1 )); then
 	
-	    # Remove the 'aws.' from in front of the resource (optional)
+        # Remove the 'aws.' from in front of the resource (optional)
         resourceTypeNew=$(echo "$resourceType" | sed 's/aws\.//g')
 		
-		# Removes any newlines/returns from the resourceTypeNew variable and saves it as $CleanedResourceType
+	# Removes any newlines/returns from the resourceTypeNew variable and saves it as $CleanedResourceType
         CleanedResourceType=${resourceTypeNew//[$'\t\r\n']}
 		
-		# Runs a c7n-org REPORT command here which uses the findings of our above policies run
-		# to generate csv files which get saved to /tmp/c7n/csvs/
+	# Runs a c7n-org REPORT command here which uses the findings of our above policies run
+	# to generate csv files which get saved to /tmp/c7n/csvs/
         echo "Running Report For Resource: $CleanedResourceType"
-        c7n-org report -s . -c config-Regional.yaml -u /tmp/c7n/policies/CustodianScanAllResourceTypesPolicies.yaml --resource $CleanedResourceType --output /tmp/c7n/csvs/c7n$CleanedResourceType.csv --format csv
+	
+	# Create the CSV Reports
+        c7n-org report -s . -c config-Regional.yaml -u /tmp/c7n/policies/CustodianScanAllResourceTypesPolicies.yaml --resource $CleanedResourceType --output /tmp/c7n/csvs/$CleanedResourceType.csv --format csv
+	
+	# Create the JSON Reports
+	c7n-org report -s . -c config-Regional.yaml -u /tmp/c7n/policies/CustodianScanAllResourceTypesPolicies.yaml --resource $CleanedResourceType --output /tmp/c7n/jsons/$CleanedResourceType.json --format json
     fi
 done
 
