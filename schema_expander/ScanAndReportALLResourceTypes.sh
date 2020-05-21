@@ -8,7 +8,7 @@
 ###                   out all resource types from the custodian schema.  Then it builds an expanded schema txt file (optional).
 ###                   Then the script will use the array of c7n resource types to generate a bare-bone policy for each resource 
 ###                   type, then it saves all policies to a .yaml file and runs c7n-org (or custodian) using that new policy file.
-###                   Once all the policies have ran, it will generate reports for each resource type saving them as seperate csvs.
+###                   Once all the policies have ran, it will generate reports for each resource type saving them as seperate csvs and jsons.
 ###                   Once all the reports have been generated the script will upload all the csvs and expanded schema file to your 
 ###                   S3 bucket and then it's done.
 ###
