@@ -7,9 +7,9 @@
 # 
 
 
-AWS resources in c7n v0.8.46.1:    **170**
+AWS resources in c7n v0.9.1.0:    **170**
 
-AWS resources in c7n v0.9.1:    **170**
+AWS resources in c7n v0.9.2.0:    **170**
 # 
 
 
