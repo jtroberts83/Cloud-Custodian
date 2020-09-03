@@ -77,16 +77,6 @@
 
 
 
-## **EBS - Elastic Block Storage:**
-
-    - source: "ec2.amazonaws.com"
-      event: ModifySnapshotAttribute
-      ids: "requestParameters.snapshotId"    
-
-* [ModifySnapshotAttribute Example Policy - Detect Public Snapshots](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ModifySnapshotAttribute.yaml)
-
-
-
 ## **CFN - CloudFormation Templates/Stacks:**
 
     - source: cloudformation.amazonaws.com
@@ -186,6 +176,18 @@
 * [CreateReplicationInstance Example Policy - Terminate Public DMS Instances](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateReplicationInstance.yaml)
 
 * [CreateEndpoint, ModifyEndpoint Example Policies - Ensure SSL Is Used On Endpoints](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateModifyEndpoint.yaml)
+
+
+
+## **EBS - Elastic Block Storage:**
+
+    - source: "ec2.amazonaws.com"
+      event: ModifySnapshotAttribute
+      ids: "requestParameters.snapshotId"    
+
+* [ModifySnapshotAttribute Example Policy - Detect Public Snapshots](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ModifySnapshotAttribute.yaml)
+
+
 
 ## **EC2 - Elastic Cloud Compute:**
 
