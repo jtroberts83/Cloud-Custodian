@@ -270,6 +270,9 @@
       event: CreatePolicyVersion
       ids: "requestParameters.policyArn"
       
+    - source: iam.amazonaws.com
+      event: PutRolePolicy
+      ids: "requestParameters.roleName"
    
 
 ## **KINESIS - Data Streams:**
