@@ -107,6 +107,20 @@
 
 * [CreateDistribution, UpdateDistribution Example Policy - Remove Allow-All Access](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateUpdateDistribution.yaml)
 
+
+
+## **CLOUDTRAIL - CloudTrail Trails:**
+
+    - source: cloudtrail.amazonaws.com
+      event: CreateTrail
+      ids: "requestParameters.name"
+
+    - source: cloudtrail.amazonaws.com
+      event: UpdateTrail
+      ids: "requestParameters.name"  
+
+
+
 ## **CLOUDWATCH - Logs**
 
     - source: "logs.amazonaws.com"
@@ -144,6 +158,14 @@
     - source: datapipeline.amazonaws.com
       event: CreatePipeline
       ids: "responseElements.pipelineId"
+
+
+
+## **DIRECTORY - Directory Service:**
+
+    - source: ds.amazonaws.com
+      event: CreateDirectory
+      ids: "responseElements.DirectoryId"
 
 
 
@@ -185,6 +207,18 @@
 
 
 
+## **ECR - Elastic Container Registry:**
+
+    - source: ecr.amazonaws.com
+      event: CreateRepository
+      ids: 'requestParameters.repositoryName'
+
+    - source: ecr.amazonaws.com
+      event: SetRepositoryPolicy
+      ids: 'requestParameters.repositoryName'
+      
+      
+
 ## **ECS - Elastic Container Service:**
 
     - source: ecs.amazonaws.com
@@ -204,6 +238,8 @@
       ids: "responseElements.fileSystemId"
 
 * [CreateFileSystem Example Policy - Delete Unencrypted EFS](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateFileSystem.yaml)
+
+
 
 ## **EKS - Elastic Kubernetes Service:**
 
@@ -236,6 +272,8 @@
 * [CreateLoadBalancerListeners, RegisterInstancesWithLoadBalancer Example Policy - Delete Non-SSL ELBs](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/CreateLoadBalancerListenersRegisterInstancesWithLoadBalancer.yaml)
 * [CreateLoadBalancer, Example Policy - Update To TLS1.2](https://github.com/jtroberts83/Cloud-Custodian/blob/master/Policies/ELBCreateLoadBalancerCreateModifyListener.yaml)
 
+
+
 ## **EMR - Elastic Map Reduce:**
 
     - source: elasticmapreduce.amazonaws.com
@@ -249,6 +287,22 @@
     - source: es.amazonaws.com
       event: CreateElasticsearchDomain
       ids: "requestParameters.domainName"
+
+
+
+## **GLACIER - Glacier Vault:**
+
+    - source: glacier.amazonaws.com
+      event: CreateVault
+      ids: "requestParameters.vaultName"
+      
+      
+
+## **Glue - Glue Jobs:**
+
+    - source: glue.amazonaws.com
+      event: CreateJob
+      ids: "requestParameters.name"
 
 
 
@@ -319,6 +373,14 @@
 
 
 
+## **LAMBDA - Serverless Functions Layer:**
+
+    - source: lambda.amazonaws.com
+      event: AddLayerVersionPermission20181031
+      ids: "requestParameters.layerName"
+      
+      
+      
 ## **MQ - Message Broker:**
 
     - source: amazonmq.amazonaws.com
@@ -327,15 +389,35 @@
 
 
 
-## **RDS - Relational Database Service:**
+## **RDS - Relational Database Service Cluster:**
 
     - source: rds.amazonaws.com
       event: CreateDBCluster
       ids: "requestParameters.dBClusterIdentifier"
 
+
+
+## **RDS - Relational Database Service Instance:**
+
     - source: rds.amazonaws.com
       event: CreateDBInstance
       ids: "requestParameters.dBInstanceIdentifier"
+
+
+
+## **RDS - Relational Database Service - Snapshot:**
+
+    - source: rds.amazonaws.com
+      event: ModifyDBSnapshotAttribute
+      ids: "requestParameters.dBSnapshotIdentifier"
+
+
+
+## **RDS - Relational Database Service - Cluster Snapshot:**
+
+    - source: rds.amazonaws.com
+      event: ModifyDBClusterSnapshotAttribute
+      ids: "requestParameters.dBClusterSnapshotIdentifier"
 
 
 
@@ -427,6 +509,14 @@
 
 
 
+## **STEP FUNCTIONS - Step Functions Machine:**
+
+    - source: states.amazonaws.com
+      event: CreateStateMachine
+      ids: 'responseElements.stateMachineArn'
+
+
+
 ## **SUBNET:**
 
     - source: ec2.amazonaws.com
@@ -445,3 +535,6 @@
       event: CreateVpcPeeringConnection
       ids: 'responseElements.vpcPeeringConnection.vpcPeeringConnectionId'
 
+    - source: ec2.amazonaws.com
+      event: CreateVpc
+      ids: "responseElements.vpc.vpcId"
