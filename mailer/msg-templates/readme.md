@@ -1,1 +1,0 @@
-![MailScreenShot](mailexample.png)
