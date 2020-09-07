@@ -1,87 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{#
-Template customizations:
-
-- additional parameters for slack channel and email for questions
-- link to our internal docs
-- case-insensitive tag lookups in the getTag macro
-- formatting that renders correctly in Office365 and acceptably in GMail
-- switch the default tags in the message from Application and Owner to our internal tags (Name, Resource Purpose, Environment, Resource Contact) plus aws:autoscaling:groupName
-#}
-
-{#
-Sample Policy that can be used with this template:
-
-Additional parameters can be passed in from the policy - i.e. action_desc, violation_desc
-
-  - name: delete-unencrypted-ec2
-    resource: ec2
-    filters:
-      - type: ebs
-        key: Encrypted
-        value: false
-    actions:
-      - terminate
-      - type: notify
-        template: custodiandefault.html
-        subject: "[custodian {{ account }}] Delete Unencrypted EC2 - {{ region }}"
-        violation_desc: "The following EC2(s) are not encrypted:"
-        action_desc: "The EC2(s) have been terminated"
-        comments: This field is for additional comments that will go into the email 
-        to:
-          - owner@domain.com
-        transport:
-          type: sqs
-          queue: https://sqs.us-east-1.amazonaws.com/12345678910/custodian-sqs-queue
-#}
 
 
 {# You can set any mandatory tags here, and they will be formatted/outputted in the message #}
-{% set requiredTags = ['Name','Resource Purpose','Environment','Resource Contact','aws:autoscaling:groupName'] %}
+{% set requiredTags = ['Purpose','Environment','Contact','Billing','CreatorID','aws:autoscaling:groupName'] %}
 
 {# The macros below format some resource attributes for better presentation #}
 {% macro getTag(resource, tagKey) -%}
-	{% if resource.get('Tags') %}
-		{% for t in resource.get('Tags') %}
-			{%  if t.get('Key')|lower == tagKey|lower %}
-				{{ t.get('Value') }}
-			{% endif %}
-		{% endfor %}
-	{% endif %}
+    {% if resource.get('Tags') %}
+        {% for t in resource.get('Tags') %}
+            {%  if t.get('Key')|lower == tagKey|lower %}
+                {{ t.get('Value') }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {%- endmacro %}
 
-
 {% macro extractList(resource, column) -%}
-		{% for p in resource.get(column) %}
-			{{ p }},
-		{% endfor %}
+    {% for p in resource.get(column) %}
+            {{ p }},
+    {% endfor %}
 {%- endmacro %}
 
 {% macro columnHeading(columnNames, tableWidth) -%}
-	<table style="width: {{ tableWidth }}; border-spacing: 0px; box-shadow: 5px 5px 5px grey; border-collapse:separate; border-radius: 7px;">
+        <table style="width: {{ tableWidth }}; border-spacing: 0px; box-shadow: 5px 5px 5px grey; border-collapse:separate; border-radius: 7px;">
     <tr>
-	{% for columnName in columnNames %}
+        {% for columnName in columnNames %}
     {% set thstyle = "background: #3e93c9; color: white; border: 1px solid #a1bae2; text-align: center; padding: 5px;" %}
     {% if loop.index == 1 %}
-		<th style="{{ thstyle }} border-top-left-radius: 15px;">{{ columnName }}</th>
+                <th style="{{ thstyle }} border-top-left-radius: 15px;">{{ columnName }}</th>
     {% elif loop.index == columnNames|length %}
     <th style="{{ thstyle }} border-top-right-radius: 15px;">{{ columnName }}</th>
     {% else %}
     <th style="{{ thstyle }}">{{ columnName }}</th>
     {% endif %}
-	{% endfor %}
+        {% endfor %}
   </tr>
 {%- endmacro %}
 
 {# This macro creates a row in the table #}
 {% macro tableRow(resource, columnNames, loop_idx, res_len) %}
     {% if loop_idx % 2 == 0 %}
-    <tr style="background-color: #cce5ff;">
+        <tr style="background-color: #cce5ff;">
     {% else %}
-    <tr>
+        <tr>
     {% endif %}
+    
     {% for columnName in columnNames %}
       {% set tdpart = "border: 1px solid grey; padding: 4px;" %}
       {% if loop_idx == res_len %}
@@ -94,6 +59,7 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
           {% set tdpart = "%s border-bottom-right-radius: 7px;" % tdpart %}
         {% endif %}
       {% endif %}
+      
       {% if columnName in requiredTags %}
         <td style="{{ tdpart }}">{{ getTag(resource,columnName) }}</td>
       {% elif columnName == 'tag.Name' %}
@@ -102,23 +68,58 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
         <td align="center" style="{{ tdpart }}">{{ resource['Instances'] | length }}</td>
       {% elif columnName == 'VolumeConsumedReadWriteOps' %}
         <td style="{{ tdpart }}">{{ resource['c7n.metrics']['AWS/EBS.VolumeConsumedReadWriteOps.Maximum'][0]['Maximum'] }}</td>
+	  {% elif columnName == 'Tags Needing Corrected' %}
+		{%  if resource.get('c7n:MatchedFilters') %}
+			 {% set MyList = resource.get('c7n:MatchedFilters') %}
+			 {% for a in MyList|unique %}
+				  {%  if 'tag:Environment' in a or 'tag:Contact' in a or 'tag:Purpose' in a or 'tag:Division' in a or 'tag:Billing' in a %}
+						{{ a }}
+				  {% endif %}
+			 {% endfor %}
+			 <td style="{{ tdpart }}">{{ a }}</td>
+		{% endif %}
+	  {% elif columnName == 'Matched Access Keys' %}
+		{%  if resource.get('c7n:matched-keys') %}
+			 {% set MyAccessKeyList = resource.get('c7n:matched-keys') %}
+			 {% for b in MyAccessKeyList %}
+				{% for key, value in b.items() %}
+			    	{%  if 'AccessKeyId' in key or 'Status' in key or 'CreateDate' in key %}
+                        {{ key }} - {{ value }}
+                    {% endif %}
+		        {% endfor %}
+			 {% endfor %}
+             <td style="{{ tdpart }}">{{ key }} - {{ value }}</td>	 
+		{% endif %}
       {% elif columnName == 'PublicIp' %}
         <td style="{{ tdpart }}">{{ resource['NetworkInterfaces'][0].get('Association')['PublicIp'] }}</td>
-	  {% elif columnName == 'Attachment InstanceId' %}
-	   {# <td style="{{ tdpart }}">{{ resource.Attachments.InstanceId }}</td> #}
-	    {%  if resource.get('Attachments') %}
-	     {% for a in resource.get('Attachments') %}
-		  {%  if a.get('InstanceId') %}
-	        <td style="{{ tdpart }}">{{ a.get('InstanceId') }}</td> 
-		  {% endif %}
-		 {% endfor %}
-		{% else %}
-          <td style="{{ tdpart }}">Unattached</td>
-		{% endif %}
-       {% else %}
+          {% elif columnName == 'Attachment InstanceId' %}
+           {# <td style="{{ tdpart }}">{{ resource.Attachments.InstanceId }}</td> #}
+            {%  if resource.get('Attachments') %}
+                {% for a in resource.get('Attachments') %}
+                    {%  if a.get('InstanceId') %}
+                        <td style="{{ tdpart }}">{{ a.get('InstanceId') }}</td>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <td style="{{ tdpart }}">Unattached</td>
+            {% endif %}
+            {% elif columnName == 'Health Event' %}
+                {# <td style="{{ tdpart }}">{{ resource['c7n:HealthEvent'][0]['Description'] }}</td> #}
+                {%  if resource.get('c7n:HealthEvent') %}
+                    {% for a in resource.get('c7n:HealthEvent') %}
+                        {%  if a.get('Description') %}
+                            <td style="{{ tdpart }}">{{ a.get('Description') }}</td>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <td style="{{ tdpart }}">No Event</td>
+                {% endif %}
+     {% elif columnName == 'CWEvent' %}
+        <td style="{{ tdpart }}">{{ event }}</td>
+     {% else %}
         <td style="{{ tdpart }}">{{ resource[columnName] }}</td>
-      {% endif %}
-    {% endfor %}
+     {% endif %}
+  {% endfor %}
     </tr>
 {%- endmacro %}
 
@@ -127,19 +128,19 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 #}
 {% macro columnData(resources, columnNames) -%}
   {% set len = resources|length %}
-	{% for resource in resources %}
+        {% for resource in resources %}
     {% set idx = loop.index %}
-		{{ tableRow(resource, columnNames, idx, len) }}
-	{% endfor %}
-	</table>
+                {{ tableRow(resource, columnNames, idx, len) }}
+        {% endfor %}
+        </table>
 {%- endmacro %}
 
 {# Main #}
 
 
 {% macro createTable(columnNames, resources, tableWidth) %}
-	{{ columnHeading(columnNames, tableWidth) }}
-	{{ columnData(resources, columnNames) }}
+        {{ columnHeading(columnNames, tableWidth) }}
+        {{ columnData(resources, columnNames) }}
 {%- endmacro %}
 
 <head>
@@ -150,22 +151,43 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 </head>
 
 <body>
+
+{% set ImageName = namespace(found=false) %}
+
+{% if policy.get('tags') %}
+	 {% for infoTag in policy.get('tags') %}
+		{% set ImageName.found = infoTag == 'Delete' %}
+	{% endfor %}
+{% endif %}
+
+
+
+{% if ImageName.found %}
+	<img src="https://mybucket.s3.amazonaws.com/images/Delete.png"></img>
+{% else %}
+	<img src="https://mybucket.s3.amazonaws.com/images/Notify.png"></img>			
+{% endif %}
+
  <table cellspacing="0" cellpadding="0" border="0"><tr><td><table style="width: 100%;" cellspacing="0" cellpadding="0" border="0"><tr><td style="line-height:0;" height="20" width="20">&nbsp;</td><td style="line-height:0;" height="20">&nbsp;</td><td style="line-height:0;" height="20" width="20">&nbsp;</td></tr><tr><td style="line-height:0;" width="20">&nbsp;</td><td>
-        <p class="redalert" style="color: #f00; font-weight: bold; font-size: 14px;">
-          <span class="underline" style="text-decoration: underline;">Please Note:</span> {{ policy['comments'] }}
-        </p>
+
       </td><td style="line-height:0;" width="20">&nbsp;</td></tr><tr><td style="line-height:0;" height="20" width="20">&nbsp;</td><td style="line-height:0;" height="20">&nbsp;</td><td style="line-height:0;" height="20" width="20">&nbsp;</td></tr></table></td></tr><tr><td><table style="width: 100%; background-color: #e7e8ea;" class="grey-bg" cellspacing="0" cellpadding="0" border="0"><tr><td style="line-height:0;" height="20" width="20">&nbsp;</td><td style="line-height:0;" height="20">&nbsp;</td><td style="line-height:0;" height="20" width="20">&nbsp;</td></tr><tr><td style="line-height:0;" width="20">&nbsp;</td><td>
         <strong>What is this email about?</strong><br>
-        This email is sent by Cloud Custodian - a platform service used for scanning and listing AWS resources that are unused or incorrectly tagged.<BR>
-		The objective is to optimize AEGON  use of AWS resources and enforce proper tagging for cost allocations across different business units or groups at Aegon <BR>
-		{{ policy['comment'] }}<BR>
-		For more information, refer to the <a href="https://Someaddress/getting-started-runbook/wiki/Cloud-Custodian-FAQ">Cloud Custodian FAQs</a>.
+        This email is automated and sent by Cloud Custodian - an tool for Cloud fleet management, cost controls, and compliance.<BR>
+                <BR>
       </td><td style="line-height:0;" width="20">&nbsp;</td></tr><tr><td style="line-height:0;" height="20" width="20">&nbsp;</td><td style="line-height:0;" height="20">&nbsp;</td><td style="line-height:0;" height="20" width="20">&nbsp;</td></tr></table></td></tr><tr><td><table style="width: 100%;" cellspacing="0" cellpadding="0" border="0"><tr><td style="line-height:0;" height="20" width="20">&nbsp;</td><td style="line-height:0;" height="20">&nbsp;</td><td style="line-height:0;" height="20" width="20">&nbsp;</td></tr><tr><td style="line-height:0;" width="20">&nbsp;</td><td>
         <br>
         <table cellspacing="0" cellpadding="0" border="0">
           <tr>
             <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>AWS ACCOUNT NAME</strong></td>
             <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ account }}</td>
+          </tr>
+		  <tr>
+            <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>AWS ACCOUNT NUMBER</strong></td>
+            {% if account_id is defined %}
+				<td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ account_id }}</td>				
+			{% else %}
+				<td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">Account Number Not Detected</td>
+			{% endif %}
           </tr>
           <tr>
             <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>AWS REGION NAME</strong></td>
@@ -176,9 +198,15 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
             <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ policy['name'] }}</td>
           </tr>
           <tr>
+            <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>POLICY RUN TIME</strong></td>
+            <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ execution_start }}</td>
+          </tr>
+          
+          
+          <tr>
             <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>POLICY DESCRIPTION</strong></td>
             <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ policy['description'] }}</td>
-          </tr> 
+          </tr>
            <tr>
             <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>VIOLATION DESCRIPTION</strong></td>
             <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ action['violation_desc'] }}</td>
@@ -189,160 +217,422 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
           </tr>
           {#<tr>
             <td class="nowrap cellpadding" style="white-space: nowrap; overflow: hidden; padding-bottom: 10px; padding-right: 10px;"><strong>DATE</strong></td>
-            <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ iso_date|iso8601_to_time|date_time_format('%a, %B %d') }}</td> 
+            <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{{ iso_date|iso8601_to_time|date_time_format('%a, %B %d') }}</td>
             <td class="cellpadding" style="padding-bottom: 10px; padding-right: 10px;">{ {% now "%B %d, %Y %I:%M:%S %Z", tz="Europe/London" %}</td>
            </tr> #}
         </table>
-		<br>
-	</table>
-		<br>
-	</table>
+                <br>
+				<br>
+        </table>
+                <br>
+        </table>
 
 {#    <h2><font color="#505151"> {{  "%s - %s" | format(account,region)  }} </h2>
     {% if action['action_desc'] %}
-		<h3> {{  action['violation_desc']  }} <br><br> <strong>{{  action['action_desc']  }}</strong>:</h3>
+                <h3> {{  action['violation_desc']  }} <br><br> <strong>{{  action['action_desc']  }}</strong>:</h3>
     {% else %}
     <h3> {{  action['violation_desc']  }}:</h3>
     {% endif %}
 #}
-		{# Below, notifications for any resource-type can be formatted with specific columns #}
-		{% if policy['resource'] == "ami" %}
-			{% set columnNames = ['Name','ImageId','CreationDate'] %}
-			{{ createTable(columnNames, resources, '60') }}
+                {# Below, notifications for any resource-type can be formatted with specific columns #}
+                
+                {% if policy['resource'] == "ami" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['Name','tag.Name','Platform','ImageId','CreationDate','State','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+						{% set columnNames = ['Name','tag.Name','Platform','ImageId','CreationDate','State','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '60') }}
+				
+				{% elif policy['resource'] == "acm-certificate" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['CertificateArn','DomainName','CreatedAt','Status','NotAfter','InUseBy','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['CertificateArn','DomainName','CreatedAt','Status','NotAfter','InUseBy','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+				
+                {% elif policy['resource'] == "app-elb" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['LoadBalancerName','CreatedTime','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['LoadBalancerName','CreatedTime','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "app-elb" %}
-		  	{% set columnNames = ['LoadBalancerName','CreatedTime','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "asg" %}
+                        {% if resources[0]['Invalid'] is defined %}
+                                {% set columnNames = ['AutoScalingGroupName','InstanceCount','Invalid','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                        {% else %}
+							{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                                {% set columnNames = ['AutoScalingGroupName','InstanceCount','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+							{% else %}
+                                {% set columnNames = ['AutoScalingGroupName','InstanceCount','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}							
+							{% endif %}
+						{% endif %}
+                        {{ createTable(columnNames, resources, '60') }}
 
-		{% elif policy['resource'] == "asg" %}
-			{% if resources[0]['Invalid'] is defined %}
-		  		{% set columnNames = ['AutoScalingGroupName','InstanceCount','Invalid'] %}
-		  	{% else %}
-		  		{% set columnNames = ['AutoScalingGroupName','InstanceCount','Name','Resource Purpose','Environment','Resource Contact'] %}
-		  	{% endif %}
-			{{ createTable(columnNames, resources, '60') }}
+                {% elif policy['resource'] == "cache-cluster" %}
+                    {% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+						{% set columnNames = ['CacheClusterId','CacheClusterCreateTime','CacheClusterStatus','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+						{% set columnNames = ['CacheClusterId','CacheClusterCreateTime','CacheClusterStatus','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "cache-cluster" %}
-		  	{% set columnNames = ['CacheClusterId','CacheClusterCreateTime','CacheClusterStatus','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "cache-snapshot" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['SnapshotName','CacheClusterId','SnapshotSource','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['SnapshotName','CacheClusterId','SnapshotSource','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "cache-snapshot" %}
-			{% set columnNames = ['SnapshotName','CacheClusterId','SnapshotSource','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "cfn" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['StackName','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['StackName','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '50') }}
 
-		{% elif policy['resource'] == "cfn" %}
-			{% set columnNames = ['StackName'] %}
-			{{ createTable(columnNames, resources, '50') }}
+                {% elif policy['resource'] == "cloudsearch" %}
+                        {% set columnNames = ['DomainName'] %}
+                        {{ createTable(columnNames, resources, '50') }}
+                
+                {% elif policy['resource'] == "cloudtrail" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['Name','S3BucketName','IncludeGlobalServiceEvents','IsMultiRegionTrail','LogFileValidationEnabled','KmsKeyId','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['Name','S3BucketName','IncludeGlobalServiceEvents','IsMultiRegionTrail','LogFileValidationEnabled','KmsKeyId','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+					
+				{% elif policy['resource'] == "codebuild" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['name','encryptionKey','created','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['name','encryptionKey','created','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+				{% elif policy['resource'] == "distribution" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['DomainName','LastModifiedTime','Id','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['DomainName','LastModifiedTime','Id','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '50') }}
+				
+                {% elif policy['resource'] == "dynamodb-table" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['TableName','CreationDateTime','SSEDescription','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['TableName','CreationDateTime','SSEDescription','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+                {% elif policy['resource'] == "ebs" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+						{% set columnNames =['VolumeId','CreateTime','State','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+						{% set columnNames =['VolumeId','CreateTime','State','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %} 
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "cloudsearch" %}
-			{% set columnNames = ['DomainName'] %}
-			{{ createTable(columnNames, resources, '50') }}
+                {% elif policy['resource'] == "ebs-snapshot" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['SnapshotId','StartTime','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['SnapshotId','StartTime','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %} 
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "ebs" %}
-		{#	{% if resources[0]['MatchedFilters'] == ['AttachmentsInstanceId'] %} #}
-				{% set columnNames =['Attachment InstanceId','VolumeId','CreateTime','State','Name','Resource Purpose','Environment','Resource Contact'] %}
-		{#	{% else %}
-				{% set columnNames =['VolumeId','CreateTime','State','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{% endif %}  #}
-			{{ createTable(columnNames, resources, '50') }}
+                {% elif policy['resource'] == "ec2" %}
+                        {% if resources[0]['c7n:HealthEvent'] is defined %}
+                                {% set columnNames = ['InstanceId','tag.Name','Environment','Health Event'] %}
+                        {% elif resources[0]['MatchedFilters'] == ['PublicIpAddress'] %}
+                                {% set columnNames = ['PublicIp','PrivateIpAddress','InstanceId','ImageId','tag.Name','Purpose','Environment','Contact','Billing','Division','LaunchTime','CreatorID','aws:autoscaling:groupName'] %}
+						{% elif resources[0]['c7n:MatchedFilters'] is defined %}
+							{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                                {% set columnNames = ['InstanceId','LaunchTime','ImageId','tag.Name','Environment','Purpose','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+							{% else %}
+                                {% set columnNames = ['InstanceId','LaunchTime','ImageId','tag.Name','Environment','Purpose','Contact','Billing','Division','CreatorID'] %}
+							{% endif %}
+						{% else %}
+                                {% set columnNames = ['PrivateIpAddress','InstanceId','ImageId','tag.Name','Purpose','Environment','Contact','Billing','Division','LaunchTime','CreatorID','aws:autoscaling:groupName'] %}
+                        {% endif %}
+                        {{ createTable(columnNames, resources, '80') }}
+                        
+                {% elif policy['resource'] == "ecs-service" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['serviceName','clusterArn','launchType','taskDefinition','createdAt','enableECSManagedTags','propagateTags','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['serviceName','clusterArn','launchType','taskDefinition','createdAt','enableECSManagedTags','propagateTags','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+                {% elif policy['resource'] == "ecs-task" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['taskArn','taskDefinitionArn','clusterArn','connectivity','createdAt','group','launchType','version','containers','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['taskArn','taskDefinitionArn','clusterArn','connectivity','createdAt','group','launchType','version','containers','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "ebs-snapshot" %}
-			{% set columnNames = ['SnapshotId','StartTime','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "efs" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['CreationToken','CreationTime','FileSystemId','OwnerId','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['CreationToken','CreationTime','FileSystemId','OwnerId','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "ec2" %}
-			{% if resources[0]['MatchedFilters'] == ['PublicIpAddress'] %}
-				{% set columnNames = ['PublicIp','PrivateIpAddress','InstanceId','ImageId','Name','Resource Purpose','Environment','Resource Contact','LaunchTime','aws:autoscaling:groupName'] %}
-			{% else %}
-				{% set columnNames = ['PrivateIpAddress','InstanceId','ImageId','Name','Resource Purpose','Environment','Resource Contact','LaunchTime','aws:autoscaling:groupName'] %}
-			{% endif %}
-			{{ createTable(columnNames, resources, '80') }}
+				{% elif policy['resource'] == "eks" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['status','endpoint','name','roleArn','version','arn','platformVersion','createdAt','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['status','endpoint','name','roleArn','version','arn','platformVersion','createdAt','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+                {% elif policy['resource'] == "elasticbeanstalk-environment" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+						{% set columnNames = ['EnvironmentName','EnvironmentId','ApplicationName','DateCreated','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+						{% set columnNames = ['EnvironmentName','EnvironmentId','ApplicationName','DateCreated','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+                {% elif policy['resource'] == "elasticsearch" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['DomainName','Endpoint','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['DomainName','Endpoint','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "efs" %}
-			{% set columnNames = ['CreationToken','CreationTime','FileSystemId','OwnerId'] %}
-			{{ createTable(columnNames, resources, '50') }}
+                {% elif policy['resource'] == "elb" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+						{% set columnNames = ['LoadBalancerName','InstanceCount','AvailabilityZones','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+						{% set columnNames = ['LoadBalancerName','InstanceCount','AvailabilityZones','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "elasticsearch" %}
-			{% set columnNames = ['DomainName','Endpoint'] %}
-			{{ createTable(columnNames, resources, '50') }}
+                {% elif policy['resource'] == "emr" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['Id','Name','NormalizedInstanceHours','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['Id','Name','NormalizedInstanceHours','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+                
+                {% elif policy['resource'] == "glue-job" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['Name','CreatedOn','Command','Timeout','GlueVersion','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['Name','CreatedOn','Command','Timeout','GlueVersion','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+                
+                
+                
+                {% elif policy['resource'] == "iam-user" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['UserName','UserId','CreateDate','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% elif 'access-key' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['UserName','Matched Access Keys','UserId','CreateDate','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% else %}
+                        {% set columnNames = ['UserName','UserId','CreateDate','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "elb" %}
-	    	{% set columnNames = ['LoadBalancerName','InstanceCount','AvailabilityZones','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                
+                
+                {% elif policy['resource'] == "kinesis" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['StreamName','StreamArn','StreamStatus','StreamCreationTimestamp','EncryptionType','KeyId','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['StreamName','StreamArn','StreamStatus','StreamCreationTimestamp','EncryptionType','KeyId','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '50') }}
+				
+				{% elif policy['resource'] == "kms-key" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['KeyId','CreationDate','Enabled','Description','KeyManager','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['KeyId','CreationDate','Enabled','Description','KeyManager','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '50') }}
+                
+                {% elif policy['resource'] == "lambda" %}
+                    {% set columnNames = ['FunctionName','Runtime','Description','Version','LastModified','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{{ createTable(columnNames, resources, '80') }}
+                
 
-		{% elif policy['resource'] == "emr" %}
-			{% set columnNames = ['Id','EmrState'] %}
-			{{ createTable(columnNames, resources, '50') }}
+                {% elif policy['resource'] == "launch-config" %}
+                    {% set columnNames = ['LaunchConfigurationName','ImageId','KeyName','InstanceType','CreatedTime','AssociatePublicIpAddress'] %}
+					{{ createTable(columnNames, resources, '50') }}
 
-		{% elif policy['resource'] == "kinesis" %}
-			{% set columnNames = ['KinesisName'] %}
-			{{ createTable(columnNames, resources, '50') }}
+                        
+                {% elif policy['resource'] == "log-group" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['logGroupName','creationTime','storedBytes','metricFilterCount','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['logGroupName','creationTime','storedBytes','metricFilterCount','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '50') }}
+                
+                {% elif policy['resource'] == "message-broker" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['BrokerArn','BrokerId','BrokerName','BrokerState','Created','PubliclyAccessible','Logs','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['BrokerArn','BrokerId','BrokerName','BrokerState','Created','PubliclyAccessible','Logs','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '50') }}
 
-		{% elif policy['resource'] == "launch-config" %}
-		    {% set columnNames = ['LaunchConfigurationName'] %}
-			{{ createTable(columnNames, resources, '30') }}
+                {% elif policy['resource'] == "rds" %}
+                    {% if resources[0]['PubliclyAccessible'] == true or resources[0]['StorageEncrypted'] == false %}
+                            {% set columnNames = ['DBInstanceIdentifier','PubliclyAccessible','StorageEncrypted','DBSubnetGroup','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+						{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                            {% set columnNames = ['DBInstanceIdentifier','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+						{% else %}
+                            {% set columnNames = ['DBInstanceIdentifier','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+						{% endif %}
+					{% endif %}
+                    {{ createTable(columnNames, resources, '80') }}
+				
+				{% elif policy['resource'] == "rds-cluster" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['DBClusterIdentifier','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['DBClusterIdentifier','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "log-group" %}
-			{% set columnNames = ['logGroupName'] %}
-			{{ createTable(columnNames, resources, '30') }}
+                {% elif policy['resource'] == "rds-snapshot" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['DBSnapshotIdentifier','SnapshotCreateTime','DBInstanceIdentifier','SnapshotType','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['DBSnapshotIdentifier','SnapshotCreateTime','DBInstanceIdentifier','SnapshotType','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "rds" %}
-			{% if resources[0]['PubliclyAccessible'] == true or resources[0]['StorageEncrypted'] == false %}
-				{% set columnNames = ['DBInstanceIdentifier','PubliclyAccessible','StorageEncrypted','DBSubnetGroup'] %}
-			{% else %}
-				{% set columnNames = ['DBInstanceIdentifier','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{% endif %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "redshift" %}
+					
+                        {% if resources[0]['PubliclyAccessible'] == true or resources[0]['Encrypted'] == false %}
+                                {% set columnNames = ['ClusterIdentifier','ClusterCreateTime','NodeType','NodeCount','DBName','PubliclyAccessible','Encrypted','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+                        {% else %}
+							{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                                {% set columnNames = ['ClusterIdentifier','ClusterCreateTime','NodeType','NodeCount','DBName','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+							{% else %}
+                                {% set columnNames = ['ClusterIdentifier','ClusterCreateTime','NodeType','NodeCount','DBName','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+							{% endif %}
+						{% endif %}
+                        {{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "rds-snapshot" %}
-			{% set columnNames = ['DBSnapshotIdentifier','SnapshotCreateTime','DBInstanceIdentifier','SnapshotType','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "redshift-snapshot" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['SnapshotIdentifier','DBName','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['SnapshotIdentifier','DBName','Name','tag.Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+					
+				{% elif policy['resource'] == "rest-api" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['id','name','createdDate','endpointConfiguration','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['id','name','createdDate','endpointConfiguration','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+					
+				{% elif policy['resource'] == "rest-stage" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['deploymentId','stageName','cacheClusterEnabled','cacheClusterStatus','methodSettings','tracingEnabled','createdDate','lastUpdatedDate','restApiId','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['deploymentId','stageName','cacheClusterEnabled','cacheClusterStatus','methodSettings','tracingEnabled','createdDate','lastUpdatedDate','restApiId','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+					
+				{% elif policy['resource'] == "sagemaker-notebook" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['NotebookInstanceName','InstanceType','CreationTime','KmsKeyId','DirectInternetAccess','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['NotebookInstanceName','InstanceType','CreationTime','KmsKeyId','DirectInternetAccess','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
+					
+				{% elif policy['resource'] == "sagemaker-model" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['ModelName','CreationTime','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+                    {% else %}
+                        {% set columnNames = ['ModelName','CreationTime','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}					
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "redshift" %}
-			{% if resources[0]['PubliclyAccessible'] == true or resources[0]['Encrypted'] == false %}
-				{% set columnNames = ['ClusterIdentifier','NodeCount','PubliclyAccessible','Encrypted'] %}
-			{% else %}
-				{% set columnNames = ['ClusterIdentifier','NodeCount','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{% endif %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "s3" %}
+                        {% if resources[0]['GlobalPermissions'] is defined %}
+                                {% set columnNames = ['Name','GlobalPermissions'] %}
+                        {% else %}
+							{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                                {% set columnNames = ['Name','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+							{% else %}
+                                {% set columnNames = ['Name','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+							{% endif %}
+						{% endif %}
+                        {{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "redshift-snapshot" %}
-			{% set columnNames = ['SnapshotIdentifier','DBName','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "security-group" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['GroupName','Name','Description','GroupId','VpcId','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['GroupName','Name','Description','GroupId','VpcId','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "s3" %}
-			{% if resources[0]['GlobalPermissions'] is defined %}
-			 	{% set columnNames = ['Name','GlobalPermissions'] %}
-			{% else %}
-				{% set columnNames = ['Name','Name','Resource Purpose','Environment','Resource Contact'] %}
-			{% endif %}
-			{{ createTable(columnNames, resources, '80') }}
+                {% elif policy['resource'] == "simpledb" %}
+                        {% set columnNames = ['DomainName'] %}
+                        {{ createTable(columnNames, resources, '60') }}
+                        
+                {% elif policy['resource'] == "sns" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['TopicArn','DisplayName','KmsMasterKeyId','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['TopicArn','DisplayName','KmsMasterKeyId','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}        
+                        
+                {% elif policy['resource'] == "sqs" %}
+					{% if 'tag' in policy['name'] and 'compliant' not in policy['name'] %}
+                        {% set columnNames = ['QueueArn','CreatedTimestamp','Purpose','Environment','Contact','Billing','Division','CreatorID','Tags Needing Corrected'] %}
+					{% else %}
+                        {% set columnNames = ['QueueArn','CreatedTimestamp','Purpose','Environment','Contact','Billing','Division','CreatorID'] %}
+					{% endif %}
+					{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "security-group" %}
-			{% set columnNames = ['GroupName','tag.Name','GroupId','VpcId'] %}
-			{{ createTable(columnNames, resources, '80') }}
 
-		{% elif policy['resource'] == "simpledb" %}
-			{% set columnNames = ['DomainName'] %}
-			{{ createTable(columnNames, resources, '60') }}
+                {# If no special formatting is defined for a resource type, all attributes will be formatted in the email #}
+                {% else %}
+                        {% set columnNames = resources[0].keys() %}
+                        {{ createTable(columnNames, resources, '100') }}
+                {% endif %}
 
-		{# If no special formatting is defined for a resource type, all attributes will be formatted in the email #}
-		{% else %}
-      {% set columnNames = resources[0].keys() %}
-			{{ createTable(columnNames, resources, '100') }}
-		{% endif %}
-
-		<h4>
-			For any other questions, contact <a href="mailto:'CloudCustodian@Company.com'">CloudCustodian@Company.com</a>
+                <h4>
+                        For any questions, contact <a href="mailto:'CloudContact@company.com'">Cloud Contact</a>
         <br>
-      <a href="https://Someaddress/getting-started-runbook/wiki/Cloud-Custodian-FAQ">Cloud Custodian FAQs</a>
+      <a href="https://mysite/Cloud-Custodian-FAQ">Cloud Custodian FAQs</a>
     </h4>
-{#    <p>Generated by cloud-custodian policy: {{ policy['name'] }}</p>
+{#    <p>Generated by cloud-custodian policy: {{ policy['Name'] }}</p>
     {% if event is none %}
-    	<p>No account number detected</p>
-    {% else %}	 
-    	<p>Account Number: {{ event['account'] }}</p>
+        <p>No account number detected</p>
+    {% else %}
+        <p>Account Number: {{ event['account'] }}</p>
     {% endif %}
 #}
 </body>
 </html>
+
