@@ -2,18 +2,25 @@
 
 export AWS_DEFAULT_REGION='us-east-1'
 
+#Create a python virtual environment
 python3 -m venv cc
+# Activate the created python virtual environment
 . cc/bin/activate
 pip install wheel
 
+# Install a static version of custodian and c7n-org (Update these to your version)
 pip install 'c7n==0.9.5'
 pip install 'c7n_org==0.6.4'
 pip install awscli
 pip install certifi
 cd ..
 
+
+# The S3 bucket where run logs and policies are stored
 RESOURCE_BUCKET='my-s3-bucket'
 
+
+# Create local directories for the policies to be downloaded to
 mkdir /Release
 mkdir /Release/regional
 mkdir /Release/global
@@ -30,6 +37,8 @@ mkdir /ReleaseProdException/
 mkdir /ReleaseProdException/global
 
 
+# This checks the S3 logs bucket for a run log with todays date in its name. If it finds one, notify and abort the policy deployment
+# This is because we don't want policies to run more than once per day as it would interfere with policy workflow timing
 DATE=$(date +%Y-%m-%d)
 for s3object in $(aws s3 ls s3://my-s3-bucket-policies/Logs/ --region us-east-1 | grep ${DATE} ) ;
 do
@@ -42,7 +51,7 @@ do
     fi
 done
 
-
+# Copies down all the organized custodian policies from the S3 bucket
 aws s3 sync s3://$RESOURCE_BUCKET/Custodian-Policies/Release/1.0.0/regional-poll/ /Release/regional/
 aws s3 sync s3://$RESOURCE_BUCKET/Custodian-Policies/Release/1.0.0/regional-lambda/ /Release/regional/
 
@@ -86,11 +95,14 @@ aws s3 sync s3://$RESOURCE_BUCKET/Custodian-Policies/Release/1.12.0/regional-pol
 aws s3 sync s3://$RESOURCE_BUCKET/Custodian-Policies/Release/1.12.0/regional-lambda/ /ReleaseCanary/regional/
 
 
-
+# Copies down the c7n-org accounts config files
 aws s3 cp s3://$RESOURCE_BUCKET/c7n_org/C7n-Org-Config-Regional.yaml /root/config-Regional.yaml
 
+# Copies the local syslog to S3 bucket
 aws s3 cp /var/log/syslog s3://my-s3-bucket-policies/Logs/SYSLOG.txt
 
+# Goes into policies directory and combines all the individual policies into 1 policy file.
+# Removes all the policies: at the top of each file and once all combined into 1 file, adds it back to the top of the new file
 cd /Release/regional/
 dos2unix *.yaml
 cat *.yaml > /tmp/allregional.yaml
@@ -143,6 +155,7 @@ policyfiles=(/tmp/allregional.yaml)
 
 DATE=`date +%Y-%m-%d`
 
+# Copies the instance profile credentials down to local variables
 creds_file="/root/.aws/credentials"
 instance_profile=`curl --noproxy 169.254.169.254 http://169.254.169.254/latest/meta-data/iam/security-credentials/`
 
@@ -153,7 +166,8 @@ expire=`curl -s --noproxy 169.254.169.254 http://169.254.169.254/latest/meta-dat
 expiretime="${expire/Expiration:/}"
 
 
-
+# Sets the instance profile role credentials to the local aws configure profile
+# This is done to avoid credential timeout errors when running on a large EC2 instance
 aws configure set aws_access_key_id $aws_access_key_id
 aws configure set aws_secret_access_key $aws_secret_access_key
 aws configure set aws_session_token $aws_session_token
